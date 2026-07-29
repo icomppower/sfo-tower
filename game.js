@@ -2006,15 +2006,27 @@ function markCleared(code) {
   refreshLocks();
 }
 
+// view-only look at a locked airport: render its layout behind the menu without
+// touching cfg.apt — startGame() restores the real selection so it can't leak into a run
+let previewApt = null;
+
+function previewLockedAirport(k) {
+  previewApt = k;
+  airport = instantiateAirport(k);
+  layoutAirport();
+  renderField();
+  $('aptName').textContent = '👁 PREVIEW: ' + airport.name + ' — 🔒 clear SFO, JFK & LHR in Stage mode to unlock';
+}
+
 function bindSelector(rowId, attr, onPick) {
   const row = $(rowId);
   row.addEventListener('click', e => {
     const btn = e.target.closest('.sel');
     if (!btn) return;
     if (btn.classList.contains('locked')) {
-      $('aptName').textContent = '🔒 Clear SFO, JFK & LHR in Stage mode to unlock';
+      previewLockedAirport(btn.dataset[attr]);
       SFX.init();
-      SFX.warn();
+      SFX.click();
       return;
     }
     for (const b of row.querySelectorAll('.sel')) b.classList.remove('on');
@@ -2032,6 +2044,7 @@ function bindSelector(rowId, attr, onPick) {
 }
 
 function setAirport(k) {
+  previewApt = null;
   cfg.apt = k;
   airportIdx = Math.max(0, AIRPORT_ORDER.indexOf(k));
   airport = instantiateAirport(k);
@@ -2151,6 +2164,7 @@ function reset() {
 }
 
 function startGame() {
+  if (previewApt) setAirport(cfg.apt); // a locked-airport preview must never become the live field
   SFX.init();
   SFX.resume();
   SFX.click();
