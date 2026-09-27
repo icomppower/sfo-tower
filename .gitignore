@@ -1,0 +1,4 @@
+data/raw/
+node_modules/
+shots/*.tmp
+.DS_Store

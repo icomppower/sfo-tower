@@ -1,0 +1,14 @@
+{
+  "name": "sfo-tower",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SFO Tower — realism fork of Tower Control: one airport (KSFO), real controller commands, real separation rules, METAR-driven runway configuration.",
+  "scripts": {
+    "fetch-data": "node tools/fetch-data.mjs",
+    "derive": "node tools/derive.mjs",
+    "verify": "./verify.sh",
+    "serve": "python3 -m http.server 8643"
+  },
+  "license": "MIT"
+}
