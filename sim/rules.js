@@ -52,10 +52,11 @@ export class Rules {
     if (finalRelated) {
       const same = a.runway === b.runway;
       const lead = a.finalDistNm < b.finalDistNm ? a : b, trail = lead === a ? b : a;
-      if (weather.conditions === CONDITIONS.VISUAL) req = same ? RADAR_FINAL_NM : 0;            // visual approaches / side-by pairs visually separated
-      else if (weather.conditions === CONDITIONS.MARGINAL) req = same ? RADAR_FINAL_NM : 1.5;   // paired instrument approaches, radar between pairs
-      else req = Math.min(lead.finalDistNm, trail.finalDistNm) <= 10 ? RADAR_FINAL_NM : RADAR_NM; // in-trail on both runways
-      const w = wakeBehind(lead.cwt, trail.cwt); if (w > req) req = w;                            // TBL 5-5-1 applies to the pair (parallels < 2,500 ft are one runway)
+      const inTrail = Math.min(lead.finalDistNm, trail.finalDistNm) <= 10 ? RADAR_FINAL_NM : RADAR_NM; // 2.5 NM only inside 10 NM (5-5-4 i)
+      if (weather.conditions === CONDITIONS.VISUAL) req = same ? inTrail : 0;            // visual approaches / side-by pairs visually separated
+      else if (weather.conditions === CONDITIONS.MARGINAL) req = same ? inTrail : 1.5;   // paired instrument approaches, radar between pairs
+      else req = inTrail;                                                                 // in-trail on both runways
+      const w = wakeBehind(lead.cwt, trail.cwt); if (w > req) req = w;                     // TBL 5-5-1 applies to the pair (parallels < 2,500 ft are one runway)
       return req;
     }
     req = RADAR_NM;
@@ -80,7 +81,9 @@ export class Rules {
       if (this.radarOff) continue;
       const req = this.requiredNm(a, b, weather);
       const kind = req > RADAR_NM ? 'WAKE' : 'SEP_LOSS';
-      if (req > 0 && dv < VERTICAL_TOL_FT && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
+      // aircraft in the same final stream are separated by distance only (both ride the same glidepath, ~950 ft per 3 NM)
+      const sameStream = a.mode === MODES.FINAL && b.mode === MODES.FINAL && this.airport.sameOrCloseParallel(a.runway, b.runway);
+      if (req > 0 && (dv < VERTICAL_TOL_FT || sameStream) && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
       else { this.clear(a, b, 'SEP_LOSS'); this.clear(a, b, 'WAKE'); }
     }
     // ---- runway events raised this step ----
@@ -158,7 +161,8 @@ export class Rules {
       if (o === arr) continue;
       if (o.onRunway === rw.physical) { // 3-10-3
         let okSep = false;
-        if (o.kind === 'ARR' && o.mode === MODES.ROLLOUT) okSep = o.alongRunwayFt >= srsDistanceFt(o.srs, arr.srs) && arr.srs !== 'III' && o.srs !== 'III';
+        if (o.kind === 'ARR' && o.clearedRunwayAt != null) okSep = true; // exited at a taxiway
+        else if (o.kind === 'ARR' && o.mode === MODES.ROLLOUT) okSep = o.alongRunwayFt >= srsDistanceFt(o.srs, arr.srs) && arr.srs !== 'III' && o.srs !== 'III';
         if (o.kind === 'DEP') okSep = o.liftoffAt != null && o.rolledFt >= srsDistanceFt(o.srs, arr.srs);
         if (!okSep) this.raise(shift, 'RUNWAY_INCURSION', arr, o, { how: `over the threshold with ${o.callsign} on runway ${o.runway}`, para: '3-10-3' });
       }

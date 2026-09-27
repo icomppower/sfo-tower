@@ -17,6 +17,7 @@ console.log('events', JSON.stringify(c)); console.log('join gating', JSON.string
 console.log('score', JSON.stringify(s.scoring.summary()));
 const viol = s.events.filter((e) => ['SEP_LOSS', 'WAKE', 'RUNWAY_INCURSION', 'CROSSING_CONFLICT', 'COLLISION', 'GO_AROUND', 'LOST'].includes(e.type));
 for (const e of viol.slice(0, verbose ? 60 : 12)) { console.log(`  ${e.t}s ${e.type} ${byCs(e.ac)}${e.other ? ' vs ' + byCs(e.other) : ''} ${e.nm != null ? e.nm + '/' + e.reqNm + 'nm' : ''} ${e.ft != null ? e.ft + 'ft' : ''} ${e.how ?? e.reason ?? ''} ${e.para ?? ''}`); if (verbose && snaps.has(e)) console.log('      ' + snaps.get(e).join('\n      ')); }
+if (verbose) for (const e of s.events.filter((x) => x.type === 'LOST')) { const a = s.aircraft.get(e.ac); console.log(`  LOST ${a?.callsign} log:`, a?.log.slice(-6).map(([t, m]) => t + ':' + m.slice(0, 60)).join(' | ')); }
 const thr = s.events.filter((e) => e.type === 'THRESHOLD').map((e) => e.altAgl); if (thr.length) console.log('threshold AGL ft: mean', Math.round(thr.reduce((a, b) => a + b, 0) / thr.length), 'max', Math.max(...thr));
 const est = s.events.filter((e) => e.type === 'ESTABLISHED').map((e) => e.distNm); if (est.length) console.log('established at NM: mean', (est.reduce((a, b) => a + b, 0) / est.length).toFixed(1), 'min', Math.min(...est));
 const rem = [...s.aircraft.values()].filter((a) => !a.done);

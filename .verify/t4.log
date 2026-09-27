@@ -1,0 +1,45 @@
+  neg caught  radar minimum lowered to 2 NM is caught
+  neg caught  wake matrices ignored is caught
+  neg caught  same-runway checks disabled is caught
+  neg caught  crossing protection off is caught
+  neg caught  a wake case injected into a legal scene is flagged (library is sensitive)
+  ok   legal   radar 3.3 NM same altitude
+  ok   legal   radar 2.0 NM, 1,100 ft apart
+  ok   illegal radar 2.8 NM, 500 ft — SEP_LOSS 2.8
+  ok   legal   final same runway 2.6 NM inside 10 NM
+  ok   illegal final same runway 2.3 NM inside 10 NM — SEP_LOSS 2.3
+  ok   illegal final same runway 2.7 NM outside 10 NM (needs 3) — SEP_LOSS 2.7
+  ok   illegal wake B (B77W) → F (B738) 3.1 NM (needs 5) — WAKE 3.1
+  ok   legal   wake B → F 5.2 NM
+  ok   illegal wake B on 28L → F on 28R 3.5 NM (parallels 750 ft apart = one runway) — WAKE 3.5
+  ok   illegal wake A (A388) → F 6.5 NM (needs 7) — WAKE 6.5
+  ok   legal   wake A → F 7.2 NM
+  ok   illegal wake E (B757) → I (C172) 3.5 NM (needs 4) — WAKE 3.5
+  ok   legal   wake E → I 4.2 NM
+  ok   legal   E (B757) → F (B738) has no wake minimum: 2.6 NM inside 10 NM is legal
+  ok   illegal wake C (B767) → G (E175) 3.2 NM (needs 3.5) — WAKE 3.2
+  ok   legal   wake C → G 3.7 NM
+  ok   illegal wake directly behind B, 4 NM, 500 ft below (needs 5) — WAKE 4
+  ok   legal   4 NM behind B but 1,500 ft below: no wake, radar ok
+  ok   illegal wake directly behind B, 4 NM, same altitude — WAKE 4
+  ok   illegal threshold wake C → I 5.5 (needs 6) — WAKE 5.5
+  ok   legal   threshold wake C → I 6.3
+  ok   illegal threshold wake F → I 3.5 (needs 4) — WAKE 3.5
+  ok   legal   threshold wake F → I 4.2
+  ok   illegal threshold wake B → F 4.5 (needs 5) — WAKE 4.5
+  ok   legal   threshold wake B → F 5.2
+  ok   legal   same runway departure behind airborne departure 7000 ft ahead
+  ok   illegal same runway departure behind airborne departure 5000 ft ahead — RUNWAY_INCURSION takeoff roll with TST359 on runway 1R
+  ok   legal   arrival over the threshold, previous arrival clear of the runway
+  ok   illegal arrival over the threshold, previous arrival still on the runway — RUNWAY_INCURSION over the threshold with TST363 on runway 28R
+  ok   illegal departure interval B → F 100 s (needs 120) — WAKE departure 100 s behind TST365 (B) across the intersection, 120 s required
+  ok   legal   departure interval B → F 130 s
+  ok   illegal departure interval A → F 170 s (needs 180) — WAKE departure 170 s behind TST369 (A) across the intersection, 180 s required
+  ok   legal   departure interval A → F 190 s
+  ok   illegal departure interval E → I 100 s (needs 120) — WAKE departure 100 s behind TST373 (E) across the intersection, 120 s required
+  ok   legal   departure interval E → F 60 s: no interval
+  ok   illegal 1R rolls with 28L arrival at 3000 ft (intersection at 4590 ft) — CROSSING_CONFLICT TST377 on runway 28L not yet past the intersection
+  ok   legal   1R rolls with 28L arrival at 5500 ft (intersection at 4590 ft)
+  ok   illegal collision 0.03 NM / 50 ft — COLLISION 0.03
+NEGATIVE 5/5
+PASS T4 Separation rules — 38 scenarios (legal + illegal), radar / wake / same-runway / crossing / collision (38 checks, 0 failed)

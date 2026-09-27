@@ -7,7 +7,7 @@ import { buildPerf, turnRate } from '../sim/perf.js';
 import { Aircraft, MODES } from '../sim/aircraft.js';
 import { Weather } from '../sim/weather.js';
 import { RNG } from '../sim/rng.js';
-import { rad, NM_FT } from '../sim/geo.js';
+import { rad, NM_FT, trackOffsets } from '../sim/geo.js';
 
 const g = new Gate('T3', 'Flight model');
 const data = loadData();
@@ -66,6 +66,17 @@ for (const t of TYPES) {
   if (!perf.small) { const fast = measureTurn(perf, 250, 8000); const f = Math.min(3, 1091 * Math.tan(rad(perf.maxBank)) / fast.tas); g.check(`${t}: bank-limited rate at 250 kt within 5 % of 1091·tan(${perf.maxBank}°)/TAS = ${f.toFixed(2)}°/s`, Math.abs(fast.rate - f) / f <= 0.05, `${fast.rate.toFixed(2)}°/s`); }
   const climb = measureClimb(perf, 3000, 8000), desc = -measureClimb(perf, 8000, 3000);
   g.check(`${t}: climb ${perf.climbFpm} fpm and descent cap ${perf.descentFpm} fpm within 5 %`, Math.abs(climb - perf.climbFpm) / perf.climbFpm <= 0.05 && Math.abs(desc - perf.descentFpm) / perf.descentFpm <= 0.05, `${climb.toFixed(0)} / ${desc.toFixed(0)} fpm`);
+}
+// lateral tracking: established 0.6 NM off the centreline at 12 NM must converge to < 0.05 NM by 8 NM (and a wrong-sign law is caught)
+{
+  const perf = perfAll.B738, rw = airport.ends['28R'];
+  const fly = (mutate) => { const e = env(); const p0 = airport.finalPoint('28R', 12); const p = { x: p0.x + Math.cos(rad(rw.finalCourse)) * 0.6, y: p0.y - Math.sin(rad(rw.finalCourse)) * 0.6 };
+    const ac = new Aircraft({ id: 'L', callsign: 'TST5', telephony: 'Test', type: 'B738', perf, kind: 'ARR', mode: MODES.FINAL, x: p.x, y: p.y, alt: gsAlt(rw, 12), hdg: rw.finalCourse, ias: 170, runway: '28R', tgtAlt: 4000, tgtIas: 170 });
+    ac.clearedApproach = true; ac.clearedLand = true; ac.established = true; ac.finalDistNm = 12; mutate?.(ac);
+    let crossAt8 = null; for (let i = 0; i < 400 && ac.finalDistNm > 7.9; i++) { e.t = i; ac.step(1, e); const { cross } = trackOffsets(rw.thr, rw.finalCourse + 180, ac); if (ac.finalDistNm <= 8 && crossAt8 == null) crossAt8 = Math.abs(cross); }
+    return crossAt8 ?? 99; };
+  g.negative('a wrong-sign centreline correction is caught', () => { const orig = Aircraft.prototype.trackFinal; Aircraft.prototype.trackFinal = function (env) { const h = orig.call(this, env); const rwE = env.airport.ends[this.runway]; return ((rwE.finalCourse - (h - rwE.finalCourse)) + 360) % 360; }; try { return fly() < 0.05; } finally { Aircraft.prototype.trackFinal = orig; } });
+  g.check('established 0.6 NM off the centreline at 12 NM, back within 0.05 NM by 8 NM', fly() < 0.05, `${fly().toFixed(3)} NM`);
 }
 // 250 kt below 10,000 ft on a departure; takeoff roll lengths
 {

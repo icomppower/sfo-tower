@@ -54,11 +54,14 @@ export class Bot {
   }
   /** Nearest altitude (3,000–10,000, 1,000 ft steps) that keeps ≥ 1,000 ft from every other aircraft within 7 NM, including the levels passed through on the way. */
   safeAltitude(m, air, eff) {
-    const others = air.filter((o) => o !== m && dist(o, m) < 7).map((o) => ({ lo: Math.min(o.alt, eff(o)) - 950, hi: Math.max(o.alt, eff(o)) + 950 }));
-    const cands = [3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000].filter((c) => m.kind === 'ARR' ? c >= 4000 : true).sort((x, y) => Math.abs(x - m.alt) - Math.abs(y - m.alt));
+    const others = air.filter((o) => o !== m && dist(o, m) < 7).map((o) => ({ lo: Math.min(o.alt, eff(o)), hi: Math.max(o.alt, eff(o)) }));
+    const cands = [3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000].filter((c) => m.kind === 'ARR' ? c >= 4000 : true).sort((x, y) => Math.abs(x - m.alt) - Math.abs(y - m.alt));
     for (const c of cands) {
-      const lo = Math.min(m.alt, c), hi = Math.max(m.alt, c);
-      if (others.every((o) => o.hi < lo || o.lo > hi)) return c;
+      if (Math.abs(c - m.alt) < 50) continue;
+      const down = c < m.alt; const lo = down ? c - 950 : m.alt + 950, hi = down ? m.alt - 950 : c + 950; // levels passed through (excluding the co-altitude zone)
+      const destOk = others.every((o) => o.hi < c - 950 || o.lo > c + 950);
+      const passOk = others.every((o) => o.hi < lo || o.lo > hi);
+      if (destOk && passOk) return c;
     }
     return null;
   }
@@ -78,15 +81,17 @@ export class Bot {
     else if (w.conditions === CONDITIONS.MARGINAL) req = same ? 3.0 : 2.0;
     else req = 3.5;
     const wake = Math.max(wakeBehind(lead.cwt, trail.cwt), wakeAtThreshold(lead.cwt, trail.cwt));
-    return Math.max(req, wake ? wake + 0.5 : 0) + (this.assist ? 0.3 : 0) + 1.0; // +1 NM compression allowance (the leader slows to Vapp inside 5 NM)
+    return Math.max(req, wake ? wake + 0.5 : 0) + (this.assist ? 0.3 : 0) + 1.0 + (wake ? 0.8 : 0); // compression allowance: the leader slows to Vapp inside 5 NM
   }
+  /** Arrival flow v4 — hold at the STAR exit fix (one altitude stack per fix, lowest released first), release via a base point B
+   *  (4 NM off the axis) to a 30° intercept of the final at T (14 NM), sequencing releases by predicted join time. */
   handleArrival(a, arrivals, acs) {
-    const s = this.shift, ap = s.airport, rw = ap.ends[a.runway];
-    const p = this.plan.get(a.id) ?? { state: 'inbound', timer: 0 }; this.plan.set(a.id, p);
+    const s = this.shift, ap = s.airport;
+    const p = this.plan.get(a.id) ?? { state: 'star', timer: 0 }; this.plan.set(a.id, p);
     const r = Math.hypot(a.x, a.y);
-    if (a.mode === MODES.GOAROUND) { p.state = 'inbound'; return; }
+    if (a.mode === MODES.GOAROUND) { p.state = 'goaround'; return; }
     if (a.mode === MODES.FINAL) {
-      p.state = 'final';
+      p.state = 'final'; this.leaveStack(a, p);
       this.finalSpeedControl(a, arrivals);
       const free = this.runwayFreeForLanding(a, acs);
       if (!a.clearedLand && a.finalDistNm <= 3.5 && free) this.cmd(a, { type: 'land', runway: a.runway });
@@ -94,48 +99,106 @@ export class Bot {
       if (a.clearedLand && a.finalDistNm <= 1.0 && a.finalDistNm > 0 && !this.runwayFreeForLanding(a, acs, true)) this.cmd(a, { type: 'goaround' });
       return;
     }
-    if (a.mode === MODES.APPROACH) { if (s.t - p.timer > 300) p.state = 'inbound'; else return; } // intercepting; give up after 5 min without capture
-    const altHeld = (p.holdAltUntil ?? 0) > s.t; // the conflict resolver owns this aircraft's altitude for a while
-    const setAlt = (alt) => { if (!altHeld && a.tgt.alt !== alt) this.cmd(a, { type: 'altitude', alt }); };
-    // speed / altitude management inbound
-    if (r < 30 && !a.tgt.iasAssigned && a.ias > 215) this.cmd(a, { type: 'speed', ias: 210 });
-    if (a.mode === MODES.STAR) { const base = ap.finalPoint(a.runway, BASE_NM); if (dist(a, base) > 10 && r > 15) { if (r < 28 && a.tgt.alt > 7000 && a.alt <= 9000) setAlt(6000); return; } }
-    const { cross, along } = trackOffsets(rw.thr, rw.finalCourse + 180, a); // along = NM out along the final axis
-    const side = Math.abs(cross) < 0.3 ? (p.side ?? 1) : Math.sign(cross); p.side = side;
-    // never let an arrival leave the scope: turn back toward the base area
-    if (r > 27 && a.mode !== MODES.STAR) { const base = ap.finalPoint(a.runway, BASE_NM + 4); const h = bearingTo(a, base); if (Math.abs(angDiff(h, a.tgt.hdg)) > 5 || a.mode !== MODES.VECTOR) this.cmd(a, { type: 'heading', hdg: h }); if (a.tgt.alt > 7000) setAlt(7000); p.state = 'return'; p.timer = s.t; return; }
-    // spacing decision: where would we join the final if we turned now?
-    // a 30° intercept from |cross| off the axis joins at along − 1.73·|cross|; meanwhile the leader closes ~2·|cross| toward the runway
-    const joinAlong = along - 1.73 * Math.abs(cross);
-    const ourNm = along + 0.27 * Math.abs(cross);
-    const lead = this.leadOnFinal(a, arrivals);
-    const leadNm = lead ? this.projectedFinalNm(lead) : -99;
-    const gap = ourNm - leadNm;
-    const need = lead ? this.spacing(lead, a) : 0;
-    // another arrival still intercepting (not established) nearby → we join 1,000 ft higher (paired approaches are stacked until established)
-    const other = arrivals.find((o) => o !== a && o.mode === MODES.APPROACH && dist(o, a) < 6);
-    const joinAlt = other ? (other.tgt.alt <= 4000 ? 5000 : 4000) : 4000;
-    const minJoin = joinAlt >= 5000 ? 14 : 10; // stay below the glideslope at the join (GS ≈ 4,100 ft at 13 NM)
-    this.why ??= {}; const why = gap < need ? 'gap' : joinAlong < minJoin ? 'joinAlong' : along > 27 ? 'far' : Math.abs(cross) > 8 ? 'cross' : 'ok'; this.why[why] = (this.why[why] ?? 0) + 1;
-    if (why === 'ok') {
-      const best = this.bestRunway(a, arrivals); if (best !== a.runway) a.runway = best;
-      const rwy = ap.ends[a.runway]; const sd = trackOffsets(rwy.thr, rwy.finalCourse + 180, a).cross > 0 ? 1 : -1;
-      this.cmd(a, { type: 'heading', hdg: wrap360(rwy.finalCourse + sd * INTERCEPT_DEG) });
-      this.cmd(a, { type: 'altitude', alt: joinAlt });
-      this.cmd(a, { type: 'approach', runway: a.runway, kind: rwy.ils ? 'ILS' : rwy.approachType });
-      p.state = 'intercept'; p.timer = s.t; return;
+    if (p.state === 'released' && (a.mode === MODES.VECTOR || a.mode === MODES.APPROACH)) { // on the way to B → T
+      if (!a.clearedApproach && (a.routeIdx >= 1 || dist(a, p.B) < 2.5)) this.cmd(a, { type: 'approach', runway: a.runway, kind: ap.ends[a.runway].ils ? 'ILS' : ap.ends[a.runway].approachType });
+      if (a.routeIdx >= 1 && a.tgt.alt > p.joinAlt && this.pathClear(a, p.joinAlt, acs)) this.cmd(a, { type: 'altitude', alt: p.joinAlt });
+      if (a.routeIdx >= 2 && s.t - p.timer > 90) { this.cmd(a, { type: 'heading', hdg: Math.round(a.hdg / 5) * 5 || 360 }); p.state = 'goaround'; } // flew through: re-sequence via the fix
+      return;
     }
-    // delay: trombone on our side of the final — move ≥ 4 NM off the centreline, run downwind (outbound) between 12 and 22 NM out
-    let h;
-    if (Math.abs(cross) < 4) h = wrap360(rw.finalCourse + 180 + side * 50);
-    else if (along < 12) h = wrap360(rw.finalCourse + 180);
-    else if (along > 22 || (p.state === 'inbound-leg' && along > 13)) { h = wrap360(rw.finalCourse); p.state = 'inbound-leg'; }
-    else h = wrap360(rw.finalCourse + 180);
-    if (p.state !== 'inbound-leg') p.state = 'delay';
-    if (Math.abs(angDiff(h, a.tgt.hdg)) > 8 || a.mode === MODES.STAR) this.cmd(a, { type: 'heading', hdg: h });
-    // altitude layering: delaying arrivals within 6 NM of each other sit 1,000 ft apart (5,000 / 6,000 / 7,000)
-    setAlt(this.layerAltitude(a, arrivals));
-    if (!(a.tgt.iasAssigned && a.tgt.ias <= 190)) this.cmd(a, { type: 'speed', ias: 190 });
+    if (a.mode === MODES.APPROACH) return;
+    const altHeld = (p.holdAltUntil ?? 0) > s.t;
+    const setAlt = (alt) => { if (!altHeld && a.tgt.alt !== alt && this.pathClear(a, alt, acs)) { this.cmd(a, { type: 'altitude', alt }); return true; } return false; };
+    if (r < 30 && !a.tgt.iasAssigned && a.ias > 215) this.cmd(a, { type: 'speed', ias: 210 });
+    // ---- which fix does this arrival hold at?
+    if (!p.fix) { p.fix = this.exitFix(a); p.stackBase = this.stackBase(a, p.fix); }
+    if (p.state === 'goaround' || p.state === 'return') { // after a go-around: fly to the fix on the missed-approach side and re-enter its stack
+      if (p.state === 'goaround') { p.state = 'return'; this.leaveStack(a, p); this.cmd(a, { type: 'direct', points: [p.fix] }); }
+      if (dist(a, p.fix) > 2.5) { setAlt(this.stackLevelFor(a, p)); return; }
+      p.state = 'star';
+    }
+    const level = this.stackLevelFor(a, p);
+    // ---- release check (lowest in its stack, or still inbound on the STAR): does the final have room for us?
+    const rel = this.releasePlan(a, p, arrivals);
+    if (rel && this.pathClear(a, Math.min(level, rel.relAlt), acs)) {
+      this.leaveStack(a, p);
+      a.runway = rel.runway;
+      this.cmd(a, { type: 'direct', points: [rel.B, rel.T] });
+      this.cmd(a, { type: 'altitude', alt: rel.relAlt });
+      if (!(a.tgt.iasAssigned && a.tgt.ias <= 190)) this.cmd(a, { type: 'speed', ias: 190 });
+      p.state = 'released'; p.timer = s.t; p.joinAlt = rel.joinAlt; p.relAlt = rel.relAlt; p.joinT = rel.tJoin; p.pathLen = rel.pathLen; p.alongT = rel.alongT; p.B = rel.B;
+      this.why ??= {}; this.why.ok = (this.why.ok ?? 0) + 1;
+      return;
+    }
+    // ---- not released: on the STAR keep flying it toward the fix (descending to the stack level early); at the fix, hold
+    if (a.mode === MODES.STAR && dist(a, p.fix) > 2) { if (r < 40 && Math.abs(a.alt - level) > 50 && (this.stacks?.[this.stackKey(p.fix)]?.length ?? 0) > 0) setAlt(level); else if (r < 40 && a.alt > level + 50) setAlt(level); this.descentGuard(a, acs); return; }
+    if (p.state !== 'hold') { p.state = 'hold'; p.leg = 'to'; p.timer = s.t; this.enterStack(a, p); this.cmd(a, { type: 'direct', points: [p.fix] }); if (!(a.tgt.iasAssigned && a.tgt.ias <= 190)) this.cmd(a, { type: 'speed', ias: 190 }); }
+    setAlt(this.stackLevelFor(a, p));
+    // racetrack at the fix: outbound away from the airport for 60 s, then back to the fix
+    const d = dist(a, p.fix), away = bearingTo({ x: 0, y: 0 }, p.fix);
+    if (p.leg === 'to' && d < 1.2) { p.leg = 'out'; p.timer = s.t; this.cmd(a, { type: 'heading', hdg: away }); }
+    else if (p.leg === 'out' && s.t - p.timer > 60) { p.leg = 'to'; p.timer = s.t; this.cmd(a, { type: 'direct', points: [p.fix] }); }
+    else if (p.leg === 'to' && s.t - p.timer > 15 && (a.route.length === 0 || a.tgt.hdgAssigned)) this.cmd(a, { type: 'direct', points: [p.fix] });
+  }
+  /** The STAR's exit fix (last fix ≥ 6 NM from the airport), or the aircraft's position if it has none. */
+  exitFix(a) {
+    const legs = a.route ?? [];
+    for (let i = legs.length - 1; i >= 0; i--) { const l = legs[i]; if (Math.hypot(l.x, l.y) >= 6) return { fix: l.fix, x: l.x, y: l.y, alt: l.alt1 ?? null, altDesc: l.altDesc }; }
+    return { fix: a.callsign + '-HOLD', x: a.x, y: a.y, alt: null };
+  }
+  stackBase(a, fix) {
+    const rw = this.shift.airport.ends[a.runway];
+    let base = Math.max(7000, fix.alt ? Math.ceil(fix.alt / 1000) * 1000 : 7000);
+    for (const side of [1, -1]) if (dist(fix, this.basePoint(a.runway, side)) < 5) base = Math.max(base, 8000); // fix next to a base point: stay above released traffic
+    return Math.min(base, 12000);
+  }
+  basePoint(runway, side) { const rw = this.shift.airport.ends[runway]; return advance(this.shift.airport.finalPoint(runway, 14 + 4 * 1.73), rw.finalCourse + 180 + side * 90, 4); }
+  // ---- stacks: one FIFO list per fix name
+  stackKey(fix) { this.stackFixes ??= []; let k = this.stackFixes.find((f) => dist(f, fix) < 9); if (!k) { k = { fix: fix.fix, x: fix.x, y: fix.y }; this.stackFixes.push(k); } return k.fix; }
+  enterStack(a, p) { this.stacks ??= {}; const st = (this.stacks[this.stackKey(p.fix)] ??= []); if (!st.includes(a.id)) st.push(a.id); }
+  leaveStack(a, p) { if (!p.fix) return; const st = this.stacks?.[this.stackKey(p.fix)]; if (st) { const i = st.indexOf(a.id); if (i >= 0) st.splice(i, 1); } }
+  stackLevelFor(a, p) { const st = this.stacks?.[this.stackKey(p.fix)] ?? []; const i = st.indexOf(a.id); const idx = i >= 0 ? i : st.length; return Math.min(13000, p.stackBase + 1000 * idx); }
+  lowestInStack(a, p) { const st = this.stacks?.[this.stackKey(p.fix)] ?? []; return st.length === 0 || st[0] === a.id; }
+  /** If this arrival can be released now, the plan: runway, B, T, join altitude, predicted join time; else null. */
+  releasePlan(a, p, arrivals) {
+    const s = this.shift, ap = s.airport;
+    if (p.state === 'hold' && !this.lowestInStack(a, p)) { this.note('stack'); return null; }
+    if (p.state !== 'hold' && (this.stacks?.[this.stackKey(p.fix)]?.length ?? 0) > 0) { this.note('stackWait'); return null; } // holders at our fix go first
+    const rw0 = ap.ends[a.runway]; const { cross } = trackOffsets(rw0.thr, rw0.finalCourse + 180, a); const side = cross >= 0 ? 1 : -1;
+    const runway = this.bestRunway(a, arrivals); const rw = ap.ends[runway];
+    const alongT = 14, T = ap.finalPoint(runway, alongT), B = this.basePoint(runway, side);
+    const pathLen = dist(a, B) + dist(B, T);
+    const gs = 190; const tJoin = pathLen / gs * 3600;
+    // spacing at the join against everyone already committed to the same / close-parallel finals
+    for (const o of arrivals) {
+      const po = this.plan.get(o.id);
+      if (o === a || !(o.mode === MODES.FINAL || o.mode === MODES.APPROACH || po?.state === 'released') || !ap.sameOrCloseParallel(o.runway, runway)) continue;
+      const oNmAtJoin = o.mode === MODES.FINAL ? o.finalDistNm - Math.max(140, o.gs) * tJoin / 3600 : (po?.alongT ?? 14) + Math.max(0, (po?.pathLen ?? 0) - (s.t - (po?.timer ?? s.t)) * gs / 3600) - gs * tJoin / 3600;
+      const need = this.spacing(o, a);
+      if (Math.abs(alongT - oNmAtJoin) < need) { this.note('gap'); return null; } // we would join too close behind (or ahead of) o
+    }
+    // altitudes: each released aircraft not yet established gets its own level (6,000 / 7,000 / 8,000); join altitudes alternate 4,000 / 5,000
+    const released = arrivals.filter((o) => o !== a && this.plan.get(o.id)?.state === 'released' && o.mode !== MODES.FINAL);
+    const usedRel = new Set(released.map((o) => this.plan.get(o.id).relAlt));
+    const relAlt = [6000, 7000, 8000].find((l) => !usedRel.has(l)) ?? 8000;
+    const lastJoin = released.length ? this.plan.get(released[released.length - 1].id).joinAlt : (this.lastJoinAlt ?? 5000);
+    const joinAlt = lastJoin === 4000 ? 5000 : 4000; this.lastJoinAlt = joinAlt;
+    if (a.mode === MODES.STAR && dist(a, B) > 22) { this.note('far'); return null; } // too early to release: keep flying the STAR
+    this.note('ok');
+    return { runway, B: { ...B, fix: 'BASE' }, T: { ...T, fix: 'JOIN' }, alongT, pathLen, tJoin, joinAlt, relAlt };
+  }
+  note(k) { this.why ??= {}; this.why[k] = (this.why[k] ?? 0) + 1; }
+  /** Is the altitude band between the aircraft's current level (exclusive of ±950) and `alt` free of other traffic within 4 NM? Co-altitude traffic never blocks a move away. */
+  pathClear(a, alt, acs) {
+    if (Math.abs(alt - a.alt) < 50) return true;
+    const down = alt < a.alt;
+    const lo = down ? alt - 950 : a.alt + 950, hi = down ? a.alt - 950 : alt + 950;
+    return !acs.some((o) => o !== a && !o.onGround && !o.done && o.mode !== MODES.TAKEOFF && dist(o, a) < 4 && o.alt > lo && o.alt < hi);
+  }
+  /** A STAR arrival descending via its procedure stops at its current level while traffic sits in the band below it. */
+  descentGuard(a, acs) {
+    const target = a.tgt.altAssigned ? a.tgt.alt : a.routeAltitude();
+    if (target >= a.alt - 50) { if (a.tgt.altAssigned && a.flags.guarded && this.pathClear(a, a.flags.guarded, acs)) { this.cmd(a, { type: 'altitude', alt: a.flags.guarded }); a.flags.guarded = null; } return; }
+    if (!this.pathClear(a, target, acs)) { const hold = Math.max(target + 1000, Math.ceil((a.alt - 100) / 1000) * 1000); if (a.tgt.alt !== hold || !a.tgt.altAssigned) { this.cmd(a, { type: 'altitude', alt: hold }); a.flags.guarded = target; } }
   }
   layerAltitude(a, arrivals) {
     const taken = new Set();
@@ -150,8 +213,10 @@ export class Bot {
     const lead = this.leadOnFinal(a, arrivals); if (!lead || lead.mode !== MODES.FINAL) return;
     const gap = a.finalDistNm - lead.finalDistNm, need = this.spacing(lead, a) - 1.0;
     const slow = Math.max(a.perf.vApp + 10, 150);
-    if (gap < need + 0.5 && a.finalDistNm > 5 && !(a.tgt.iasAssigned && a.tgt.ias <= slow)) this.cmd(a, { type: 'speed', ias: slow });
-    else if (gap > need + 2 && a.finalDistNm > 8 && a.tgt.iasAssigned && a.tgt.ias < 180) this.cmd(a, { type: 'speed', ias: 180 });
+    const match = Math.max(a.perf.vApp, Math.min(180, Math.round((lead.ias + 5) / 10) * 10)); // never faster than the leader + 5
+    const want = gap < need + 0.5 ? slow : gap < need + 1.5 ? Math.min(match, 170) : null;
+    if (want != null && a.finalDistNm > 5 && !(a.tgt.iasAssigned && a.tgt.ias <= want)) this.cmd(a, { type: 'speed', ias: want });
+    else if (gap > need + 2.5 && a.finalDistNm > 8 && a.tgt.iasAssigned && a.tgt.ias < 180) this.cmd(a, { type: 'speed', ias: 180 });
   }
   bestRunway(a, arrivals) {
     const ap = this.shift.airport, cfg = this.shift.config;

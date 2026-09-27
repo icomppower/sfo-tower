@@ -98,6 +98,7 @@ export class Aircraft {
     // ---- lateral guidance ----
     let desiredHdg = this.tgt.hdg, turn = this.tgt.turn;
     if (this.mode === MODES.STAR || this.mode === MODES.SID) desiredHdg = this.navigateRoute(env);
+    if (this.mode === MODES.VECTOR && this.route.length && this.routeIdx < this.route.length && !this.tgt.hdgAssigned) desiredHdg = this.navigateRoute(env);
     if (this.mode === MODES.APPROACH) { if (this.route.length && this.routeIdx < this.route.length && !this.tgt.hdgAssigned) desiredHdg = this.navigateRoute(env); this.tryCapture(env); }
     if (this.mode === MODES.FINAL) desiredHdg = this.trackFinal(env);
     if (this.mode === MODES.GOAROUND) { desiredHdg = this.tgt.hdg; if (this.alt >= GA_ALT_FT - 50 || this.modeTimer > 90) { this.mode = MODES.VECTOR; } }
@@ -156,7 +157,7 @@ export class Aircraft {
       this.routeIdx++; env.events.push({ t: env.t, type: 'FIX', ac: this.id, fix: leg.fix });
       if (this.routeIdx >= this.route.length) { // end of route: continue on the last course
         this.tgt.hdg = this.hdg; if (this.mode === MODES.STAR) { this.mode = MODES.VECTOR; if (!this.tgt.altAssigned) this.tgt.alt = legAltitude(leg, this.alt); if (!this.tgt.iasAssigned) this.tgt.ias = Math.min(this.perf.vClean, 210); env.events.push({ t: env.t, type: 'STAR_END', ac: this.id }); }
-        else if (this.mode === MODES.SID) { this.tgt.hdg = this.hdg; }
+        else { this.tgt.hdg = this.hdg; }
         return this.hdg;
       }
       return bearingTo(this, this.route[this.routeIdx]);
@@ -181,10 +182,10 @@ export class Aircraft {
   tryCapture(env) {
     const rw = env.airport.ends[this.runway]; if (!rw) return;
     const { cross, along } = trackOffsets(rw.thr, rw.finalCourse + 180, this); // along: NM before the threshold along the reciprocal
-    const dThr = along; if (dThr < 0.5 || dThr > 28) return;
+    const dThr = along; if (dThr < 0.5 || dThr > 18) return; // localizer service volume ≈ 18 NM (AIM 1-1-9)
     const intercept = Math.abs(angDiff(this.hdg, rw.finalCourse));
     const width = 0.15 + dThr * Math.tan(rad(2.5));
-    const closing = Math.sign(cross) !== Math.sign(angDiff(this.hdg, rw.finalCourse)) || Math.abs(cross) < 0.1; // turning toward the course
+    const closing = Math.sign(cross) === Math.sign(angDiff(this.hdg, rw.finalCourse)) || Math.abs(cross) < 0.1; // heading converges on the course (cross > 0 = right of the outbound course = needs a heading right of the final course)
     if (Math.abs(cross) <= width && intercept <= 45 && (closing || Math.abs(cross) < width / 2)) {
       this.mode = MODES.FINAL; this.established = true; this.finalDistNm = dThr; this.tgt.turn = null; this.tgt.hdgAssigned = false;
       env.events.push({ t: env.t, type: 'ESTABLISHED', ac: this.id, runway: this.runway, distNm: +dThr.toFixed(1), kind: this.approachKind });
@@ -194,7 +195,7 @@ export class Aircraft {
     const rw = env.airport.ends[this.runway];
     const { cross, along } = trackOffsets(rw.thr, rw.finalCourse + 180, this);
     this.finalDistNm = along;
-    const corr = Math.max(-30, Math.min(30, -Math.atan2(cross, 0.6) * 180 / Math.PI));
+    const corr = Math.max(-30, Math.min(30, Math.atan2(cross, 0.6) * 180 / Math.PI)); // cross > 0 (right of the outbound course) → steer right of the final course
     return wrap360(rw.finalCourse + corr);
   }
   finalBookkeeping(env) {

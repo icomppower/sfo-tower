@@ -7,7 +7,7 @@ const altWords = (a) => a >= 18000 ? `flight level ${digits(Math.round(a / 100))
 const rwyWords = (r) => r.replace(/(\d+)([LRC]?)/, (_, n, s) => digits(n, n.length) + (s === 'L' ? ' left' : s === 'R' ? ' right' : s === 'C' ? ' center' : ''));
 const cs = (ac) => `${ac.telephony} ${ac.callsign.replace(/^[A-Z]{3}/, '')}`.trim();
 
-export const COMMANDS = ['heading', 'altitude', 'speed', 'approach', 'land', 'luaw', 'takeoff', 'holdshort', 'goaround'];
+export const COMMANDS = ['heading', 'direct', 'altitude', 'speed', 'approach', 'land', 'luaw', 'takeoff', 'holdshort', 'goaround'];
 
 /** Returns { ok, readback, error } and mutates the aircraft. */
 export function applyCommand(shift, ac, cmd) {
@@ -23,6 +23,14 @@ export function applyCommand(shift, ac, cmd) {
       if (ac.mode === MODES.FINAL || ac.mode === MODES.APPROACH) { ac.clearedApproach = false; ac.clearedLand = false; ac.established = false; }
       ac.mode = ac.mode === MODES.GOAROUND ? MODES.GOAROUND : MODES.VECTOR; ac.tgt.hdg = h; ac.tgt.turn = turn; ac.tgt.hdgAssigned = true; ac.route = []; ac.routeIdx = 0;
       return ok(`${turn === 'L' ? 'Left' : 'Right'} heading ${digits(h)}, ${cs(ac)}.`);
+    }
+    case 'direct': { // proceed direct to a fix / point, then continue on that course (bot base legs, player "direct" to a named fix)
+      if (ac.onGround || ac.mode === MODES.TAKEOFF) return nope('on the ground');
+      const pts = (cmd.points ?? [cmd.point]).filter(Boolean); if (!pts.length) return nope('no fix');
+      if (ac.mode === MODES.FINAL) { ac.clearedApproach = false; ac.clearedLand = false; ac.established = false; }
+      if (ac.mode !== MODES.APPROACH) ac.mode = ac.mode === MODES.GOAROUND ? MODES.GOAROUND : MODES.VECTOR;
+      ac.route = pts.map((q) => ({ fix: q.fix ?? 'DIRECT', x: q.x, y: q.y })); ac.routeIdx = 0; ac.tgt.hdgAssigned = false; ac.tgt.turn = null;
+      return ok(`Direct ${pts.map((q) => q.fix ?? 'the fix').join(' then ')}, ${cs(ac)}.`);
     }
     case 'altitude': {
       if (ac.onGround || ac.mode === MODES.TAKEOFF) return nope('on the ground');
@@ -50,8 +58,7 @@ export function applyCommand(shift, ac, cmd) {
       if (kind === 'ILS' && !rw.ils) return nope(`no ILS for runway ${cmd.runway}`);
       ac.runway = cmd.runway; ac.approachKind = kind; ac.clearedApproach = true; ac.clearedLand = false;
       if (ac.mode === MODES.FINAL) { ac.established = false; }
-      if (ac.mode !== MODES.STAR) { ac.route = []; ac.routeIdx = 0; }
-      ac.mode = MODES.APPROACH;
+      ac.mode = MODES.APPROACH; // any STAR / direct routing continues until the localizer is captured
       if (kind === 'VISUAL') { ac.tgt.hdgAssigned = true; ac.tgt.hdg = ac.hdg; ac.tgt.turn = null; }
       return ok(`Cleared ${kind === 'ILS' ? 'I-L-S' : kind === 'RNAV' ? 'R-NAV' : 'visual'} approach runway ${rwyWords(cmd.runway)}, ${cs(ac)}.`);
     }

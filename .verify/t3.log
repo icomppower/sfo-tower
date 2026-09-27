@@ -61,7 +61,9 @@
   ok   PC12: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 81 ft AGL, td 1433 ft
   ok   PC12: standard rate turn 3°/s at 100 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
   ok   PC12: climb 700 fpm and descent cap 1000 fpm within 5 % — 700 / 1000 fpm
+  neg caught  a wrong-sign centreline correction is caught
+  ok   established 0.6 NM off the centreline at 12 NM, back within 0.05 NM by 8 NM — 0.001 NM
   ok   departure never exceeds 250 kt IAS below 10,000 ft (14 CFR 91.117 / AIM 4-4-12) — 250 kt
   ok   B738 liftoff after a 3,000–8,000 ft roll at Vr — 5003 ft
-NEGATIVE 5/5
-PASS T3 Flight model — 10 types × approach speed / glideslope / TCH / turns / climb (60 checks, 0 failed)
+NEGATIVE 6/6
+PASS T3 Flight model — 10 types × approach speed / glideslope / TCH / turns / climb (61 checks, 0 failed)
