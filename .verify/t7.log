@@ -1,0 +1,18 @@
+  neg caught  a bot that never clears anyone to land is caught (nothing lands, everything is lost)
+  neg caught  a bot with the crossing check removed is caught by the rules
+  neg caught  a bot that releases without spacing is caught
+  ok   easy/a (WEST VISUAL, 7 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 3/7, dep 9, sep 0, wake 0, incur 0, cross 0, GA 0, delay 0 min
+  ok   easy/b (WEST VISUAL, 11 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 10/11, dep 7, sep 0, wake 0, incur 0, cross 0, GA 0, delay 100 min
+  ok   easy/c (WEST MARGINAL, 29 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 24/29, dep 6, sep 0, wake 0, incur 0, cross 0, GA 0, delay 71 min
+  ok   easy/d (WEST VISUAL, 13 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 11/13, dep 14, sep 0, wake 0, incur 0, cross 0, GA 0, delay 49 min
+  ok   easy/e (WEST VISUAL, 11 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 10/11, dep 9, sep 0, wake 0, incur 0, cross 0, GA 0, delay 56 min
+  ok   easy/f (WEST VISUAL, 7 arrivals): 0 losses, 0 collisions, ≥ 70 % landed, full 60 min — landed 6/7, dep 6, sep 0, wake 0, incur 0, cross 0, GA 0, delay 14 min
+  ok   easy/a/fog (WEST VISUAL): 0 losses, 0 collisions — landed 15/19, sep 0, wake 0, cross 0
+  ok   easy/b/fog (WEST INSTRUMENT): 0 losses, 0 collisions — landed 13/15, sep 0, wake 0, cross 0
+  ok   easy/c/storm (SOUTHEAST VISUAL): 0 losses, 0 collisions — landed 7/10, sep 0, wake 0, cross 0
+  ok   normal/a: no collision, ≤ 3 separation losses, ≥ 45 % landed (busy hours run at runway capacity with a full pipeline at the end) — landed 17/21, losses 0, GA 0, delay 51 min
+  ok   normal/b: no collision, ≤ 3 separation losses, ≥ 45 % landed (busy hours run at runway capacity with a full pipeline at the end) — landed 9/13, losses 0, GA 0, delay 216 min
+  ok   normal/c: no collision, ≤ 3 separation losses, ≥ 45 % landed (busy hours run at runway capacity with a full pipeline at the end) — landed 15/30, losses 2, GA 1, delay 491 min
+  ok   hard / no assist (3 seeds): measurable separation losses, no shift ends in a collision before 30 min — 42 arr, sep 3, wake 0, coll 0, t 3600 | 41 arr, sep 1, wake 1, coll 0, t 3600 | 24 arr, sep 2, wake 0, coll 0, t 3600
+NEGATIVE 3/3
+PASS T7 Bot shift — easy ×9 clean, normal ×3 bounded, hard ×3 measurable losses (13 checks, 0 failed)

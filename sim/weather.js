@@ -30,7 +30,7 @@ export class Weather {
     for (let i = 0; i < n - need; i++) {
       const r = this.recs[i], c = classify(r);
       const fog = r.wx.some((w) => /FG|BR/.test(w)) && c !== CONDITIONS.VISUAL;
-      const storm = r.wd != null && r.wd >= 100 && r.wd <= 200 && r.ws >= 12;
+      const storm = r.wd != null && r.ws >= 12 && chooseConfig({ dir: r.wd, kt: r.ws }, airport).id === 'SOUTHEAST';
       const hourOk = ((r.t / 3600) % 24 + 24 - 8) % 24; // local-ish (UTC-8) hour
       if (hourOk < 6 && setting !== 'fog') continue; // shifts run in the operating day
       if (setting === 'clear' && !(c === CONDITIONS.VISUAL && r.ws <= 20)) continue;

@@ -84,7 +84,7 @@ export class Aircraft {
     const v = this.ias / 3600; const step = advance({ x: this.x, y: this.y }, rw.hdg, v * dt); this.x = step.x; this.y = step.y;
     this.alongRunwayFt = trackOffsets(rw.thr, rw.hdg, this).along * NM_FT;
     // exit at the first high-speed exit once slow enough (exits assumed every ~1,500 ft beyond the type's rollout footprint)
-    if (this.ias <= 45 && this.alongRunwayFt >= p.rolloutFt * 0.8 && this.clearedRunwayAt == null) {
+    if (this.ias <= 45 && (this.alongRunwayFt >= p.rolloutFt * 0.8 || this.ias <= 20) && this.clearedRunwayAt == null) { // slow enough for the next exit (or already stopped)
       this.clearedRunwayAt = env.t; env.events.push({ t: env.t, type: 'CLEAR_RUNWAY', ac: this.id, runway: this.runway, how: 'exit', occupancyS: env.t - this.thresholdCrossedAt, rolloutFt: Math.round(this.alongRunwayFt) });
     }
     if (this.clearedRunwayAt != null && env.t - this.clearedRunwayAt >= 6) {

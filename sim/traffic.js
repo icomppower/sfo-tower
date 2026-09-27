@@ -65,8 +65,9 @@ export class Traffic {
     while (this.schedule.length && this.schedule[0].t <= shift.t) {
       const s = this.schedule[0];
       // en-route metering (D22, TBFM-style): no new arrival while ≥ 9 arrivals are airborne and not yet on the approach
-      if (s.kind === 'ARR' && shift.t > 0 && ([...shift.aircraft.values()].filter((o) => o.kind === 'ARR' && !o.done && !o.onGround && o.mode !== 'FINAL' && o.mode !== 'APPROACH').length >= 9 || shift.meter?.())) { s.t = shift.t + 30; this.schedule.sort((a, b) => a.t - b.t); break; }
+      if (s.kind === 'ARR' && shift.t > 0 && [...shift.aircraft.values()].filter((o) => o.kind === 'ARR' && !o.done && !o.onGround && o.mode !== 'FINAL' && o.mode !== 'APPROACH').length >= 10) { s.t = shift.t + 30; this.schedule.sort((a, b) => a.t - b.t); break; }
       const ac = s.kind === 'ARR' ? this.makeArrival(shift, s.t) : this.makeDeparture(shift, s.t);
+      if (ac.kind === 'ARR' && shift.t > 0 && shift.meter?.(ac.star)) { s.t = shift.t + 30; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); break; } // that side's stack is full: try again later
       // keep new arrivals 3 NM / 1,000 ft from everyone and ≥ 7 NM behind the previous arrival on the same STAR (wake behind heavies, 5-5-4 TBL 5-5-1)
       if (ac.kind === 'ARR' && [...shift.aircraft.values()].some((o) => !o.done && !o.onGround && ((dist(o, ac) < 3 && Math.abs(o.alt - ac.alt) < 1000) || (o.kind === 'ARR' && o.star === ac.star && dist(o, ac) < 7)))) { s.t = shift.t + 45; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); continue; }
       this.schedule.shift();

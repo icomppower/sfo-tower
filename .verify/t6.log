@@ -1,0 +1,30 @@
+  neg caught  condition classifier with the visual/instrument thresholds swapped is caught
+  neg caught  a runway chooser that ignores the wind is caught
+  neg caught  a bot with no throughput difference between clear and fog is caught
+  ok   classify ceiling 3500 ft / vis 8 sm → VISUAL — VISUAL
+  ok   classify ceiling 3499 ft / vis 10 sm → MARGINAL — MARGINAL
+  ok   classify ceiling 5000 ft / vis 7.9 sm → MARGINAL — MARGINAL
+  ok   classify ceiling 999 ft / vis 10 sm → INSTRUMENT — INSTRUMENT
+  ok   classify ceiling 5000 ft / vis 2.9 sm → INSTRUMENT — INSTRUMENT
+  ok   classify ceiling 1000 ft / vis 3 sm → MARGINAL — MARGINAL
+  ok   classify ceiling null ft / vis null sm → VISUAL — VISUAL
+  ok   wind calm/0 → WEST — WEST
+  ok   wind 280/15 → WEST — WEST
+  ok   wind 320/12 → WEST — WEST
+  ok   wind 150/18 → SOUTHEAST — SOUTHEAST
+  ok   wind 120/14 → SOUTHEAST — SOUTHEAST
+  ok   wind 300/32 → WEST_28RT — WEST_28RT
+  ok   wind 100/6 → WEST — WEST
+  ok   "clear" windows are VISUAL at the start (10 seeds)
+  ok   "fog" windows are not VISUAL and report fog/mist (10 seeds)
+  ok   "storm" windows select the Southeast Plan (10 seeds)
+  ok   "auto" windows are VISUAL at about the historical rate (77 %) — 32/40
+  ok   visual approach clearance refused in fog
+  ok   visual approach clearance accepted in clear weather
+  ok   saturated VISUAL ops/h 73 within [62, 107] (profile 28/01 side-bys 104–107 × 0.6 floor) — arr 31 dep 42, losses 5
+  ok   saturated INSTRUMENT ops/h 64 within [46, 78] (profile 28/01 in-trail 76–78 × 0.6 floor) — arr 24 dep 40, losses 12
+  ok   arrivals per hour: VISUAL exceeds INSTRUMENT — 31 vs 24
+  ok   saturated runs: no collision, full 60 min
+  ok   hardest setting (hard / fog / no assist) shows losses, go-arounds or holding delay — {"sep":5,"wake":0,"ga":1,"delay":456}
+NEGATIVE 3/3
+PASS T6 Weather — VISUAL 73 ops/h (31 arr), INSTRUMENT 64 ops/h (24 arr) (25 checks, 0 failed)
