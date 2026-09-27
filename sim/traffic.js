@@ -26,7 +26,7 @@ const GA = [['C172', 3], ['PC12', 2], ['C56X', 2], ['GLF5', 1], ['CL60', 1]];
 // STAR weights by origin direction (BTS top origins: LAX/SAN/SNA/LAS/PHX south-east, SEA/PDX north, DEN/ORD/JFK east, HNL/Asia west).
 const STAR_WEIGHTS = { WEST: [['SERFR4', 34], ['DYAMD5', 26], ['BDEGA4', 18], ['PIRAT3', 12], ['YOSEM3', 10]], SOUTHEAST: [['WWAVS2', 34], ['ALWYS3', 30], ['STLER4', 24], ['PIRAT3', 6], ['MOD9', 6]] };
 const SID_BY_RUNWAY = { '1L': [['SSTIK5', 4], ['SEGUL1', 3], ['GAPP7', 1]], '1R': [['TRUKN2', 4], ['NIITE4', 3], ['GAPP7', 1]], '28L': [['WESLA5', 3], ['GNNRR3', 2], ['SNTNA2', 2], ['TRUKN2', 1]], '28R': [['WESLA5', 3], ['GNNRR3', 2], ['TRUKN2', 2], ['NIITE4', 1]], '10L': [['CIITY3', 3], ['SAHEY4', 2], ['MOLEN9', 1]], '10R': [['CIITY3', 3], ['SAHEY4', 2], ['MOLEN9', 1]], '19L': [['CIITY3', 2], ['SAHEY4', 2], ['MOLEN9', 2]], '19R': [['CIITY3', 2], ['SAHEY4', 2], ['MOLEN9', 2]] };
-export const DIFFICULTY = { easy: { rate: 0.55, intl: 0.08, assist: true }, normal: { rate: 0.85, intl: 0.12, assist: true }, hard: { rate: 1.15, intl: 0.16, assist: false } };
+export const DIFFICULTY = { easy: { rate: 0.45, intl: 0.08, assist: true, capArr: 22, capDep: 24 }, normal: { rate: 0.8, intl: 0.12, assist: true, capArr: 40, capDep: 44 }, hard: { rate: 1.15, intl: 0.16, assist: false, capArr: 99, capDep: 99 } };
 
 export class Traffic {
   constructor({ rng, trafficJson, perf, procedures, airport, config, difficulty, month, dow, startHour, durationS, demand = null }) {
@@ -42,7 +42,7 @@ export class Traffic {
     const h = Math.floor((this.startHour * 3600 + simT) / 3600) % 24;
     const base = (kind === 'ARR' ? this.arrPerHour : this.depPerHour)[h];
     const intl = 1 + this.difficulty.intl * (h >= 16 || h <= 1 ? 1.6 : 0.6);
-    return Math.max(2, base * intl * this.difficulty.rate + 1.2);
+    return Math.min(kind === 'ARR' ? this.difficulty.capArr : this.difficulty.capDep, Math.max(2, base * intl * this.difficulty.rate + 1.2));
   }
   buildSchedule() {
     for (const kind of ['ARR', 'DEP']) {
@@ -64,8 +64,8 @@ export class Traffic {
   spawn(shift) {
     while (this.schedule.length && this.schedule[0].t <= shift.t) {
       const s = this.schedule[0];
-      // en-route metering (D22, TBFM-style): no new arrival while ≥ 6 arrivals are airborne and not yet on the approach
-      if (s.kind === 'ARR' && shift.t > 0 && [...shift.aircraft.values()].filter((o) => o.kind === 'ARR' && !o.done && !o.onGround && o.mode !== 'FINAL' && o.mode !== 'APPROACH').length >= 6) { s.t = shift.t + 30; this.schedule.sort((a, b) => a.t - b.t); break; }
+      // en-route metering (D22, TBFM-style): no new arrival while ≥ 9 arrivals are airborne and not yet on the approach
+      if (s.kind === 'ARR' && shift.t > 0 && ([...shift.aircraft.values()].filter((o) => o.kind === 'ARR' && !o.done && !o.onGround && o.mode !== 'FINAL' && o.mode !== 'APPROACH').length >= 9 || shift.meter?.())) { s.t = shift.t + 30; this.schedule.sort((a, b) => a.t - b.t); break; }
       const ac = s.kind === 'ARR' ? this.makeArrival(shift, s.t) : this.makeDeparture(shift, s.t);
       // keep new arrivals 3 NM / 1,000 ft from everyone and ≥ 7 NM behind the previous arrival on the same STAR (wake behind heavies, 5-5-4 TBL 5-5-1)
       if (ac.kind === 'ARR' && [...shift.aircraft.values()].some((o) => !o.done && !o.onGround && ((dist(o, ac) < 3 && Math.abs(o.alt - ac.alt) < 1000) || (o.kind === 'ARR' && o.star === ac.star && dist(o, ac) < 7)))) { s.t = shift.t + 45; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); continue; }

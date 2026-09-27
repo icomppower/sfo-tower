@@ -19,7 +19,7 @@
   ok   legal   28R arrival over the threshold, previous arrival exited
   ok   illegal 1L departure rolls with another aircraft lined up ahead on 1L — RUNWAY_INCURSION takeoff roll with TST108 on runway 1L
   ok   legal   1L rolls while a 28R arrival is past the 28R×1L intersection (5,338 ft)
-  ok   bot works a 60-min easy shift with 0 crossing conflicts and 0 runway incursions while launching 1L/1R departures between 28L/28R arrivals — landed 6, departed 9, crossing 0, incursions 0
-  ok   at least 6 departures rolled on 1L/1R across the 28 arrival stream — 9
+  ok   bot works a 60-min easy shift with 0 crossing conflicts and 0 runway incursions while launching 1L/1R departures between 28L/28R arrivals — landed 5, departed 8, crossing 0, incursions 0
+  ok   at least 6 departures rolled on 1L/1R across the 28 arrival stream — 8
 NEGATIVE 3/3
 PASS T5 SFO runway ops — 18 crossing / occupancy scenarios + bot shift (20 checks, 0 failed)
