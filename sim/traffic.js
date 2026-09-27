@@ -64,7 +64,8 @@ export class Traffic {
     while (this.schedule.length && this.schedule[0].t <= shift.t) {
       const s = this.schedule[0];
       const ac = s.kind === 'ARR' ? this.makeArrival(shift, s.t) : this.makeDeparture(shift, s.t);
-      if (ac.kind === 'ARR' && [...shift.aircraft.values()].some((o) => !o.done && !o.onGround && dist(o, ac) < 3 && Math.abs(o.alt - ac.alt) < 1000)) { s.t = shift.t + 45; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); continue; }
+      // keep new arrivals 3 NM / 1,000 ft from everyone and ≥ 7 NM behind the previous arrival on the same STAR (wake behind heavies, 5-5-4 TBL 5-5-1)
+      if (ac.kind === 'ARR' && [...shift.aircraft.values()].some((o) => !o.done && !o.onGround && ((dist(o, ac) < 3 && Math.abs(o.alt - ac.alt) < 1000) || (o.kind === 'ARR' && o.star === ac.star && dist(o, ac) < 7)))) { s.t = shift.t + 45; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); continue; }
       this.schedule.shift();
       if (ac) { shift.aircraft.set(ac.id, ac); shift.events.push({ t: shift.t, type: 'SPAWN', ac: ac.id, kind: ac.kind, callsign: ac.callsign, acType: ac.type }); }
     }

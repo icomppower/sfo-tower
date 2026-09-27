@@ -101,7 +101,7 @@ export class Bot {
     }
     if (p.state === 'released' && (a.mode === MODES.VECTOR || a.mode === MODES.APPROACH)) { // on the way to B → T
       if (!a.clearedApproach && (a.routeIdx >= 1 || dist(a, p.B) < 2.5)) this.cmd(a, { type: 'approach', runway: a.runway, kind: ap.ends[a.runway].ils ? 'ILS' : ap.ends[a.runway].approachType });
-      if (a.routeIdx >= 1 && a.tgt.alt > p.joinAlt && this.pathClear(a, p.joinAlt, acs)) this.cmd(a, { type: 'altitude', alt: p.joinAlt });
+      if (a.tgt.alt > p.joinAlt && dist(a, p.fix) > 3 && this.pathClear(a, p.joinAlt, acs)) this.cmd(a, { type: 'altitude', alt: p.joinAlt }); // descend as soon as the way is clear
       if (a.routeIdx >= 2 && s.t - p.timer > 90) { this.cmd(a, { type: 'heading', hdg: Math.round(a.hdg / 5) * 5 || 360 }); p.state = 'goaround'; } // flew through: re-sequence via the fix
       return;
     }
@@ -167,13 +167,13 @@ export class Bot {
     const runway = this.bestRunway(a, arrivals); const rw = ap.ends[runway];
     const alongT = 14, T = ap.finalPoint(runway, alongT), B = this.basePoint(runway, side);
     const pathLen = dist(a, B) + dist(B, T);
-    const gs = 190; const tJoin = pathLen / gs * 3600;
-    // spacing at the join against everyone already committed to the same / close-parallel finals
+    const gs = 190; const v0 = Math.max(gs, a.gs || gs); const tJoin = (Math.min(pathLen, 3) / v0 + Math.max(0, pathLen - 3) / gs) * 3600; // decelerating to 190 over the first miles
+    // spacing at the join against everyone already committed to the same / close-parallel finals (in-transit aircraft get an extra 1.5 NM margin)
     for (const o of arrivals) {
       const po = this.plan.get(o.id);
       if (o === a || !(o.mode === MODES.FINAL || o.mode === MODES.APPROACH || po?.state === 'released') || !ap.sameOrCloseParallel(o.runway, runway)) continue;
       const oNmAtJoin = o.mode === MODES.FINAL ? o.finalDistNm - Math.max(140, o.gs) * tJoin / 3600 : (po?.alongT ?? 14) + Math.max(0, (po?.pathLen ?? 0) - (s.t - (po?.timer ?? s.t)) * gs / 3600) - gs * tJoin / 3600;
-      const need = this.spacing(o, a);
+      const need = this.spacing(o, a) + (o.mode === MODES.FINAL ? 0 : 1.5);
       if (Math.abs(alongT - oNmAtJoin) < need) { this.note('gap'); return null; } // we would join too close behind (or ahead of) o
     }
     // altitudes: each released aircraft not yet established gets its own level (6,000 / 7,000 / 8,000); join altitudes alternate 4,000 / 5,000
@@ -223,8 +223,9 @@ export class Bot {
     if (!cfg.pairedArrivals) return a.runway;
     let best = a.runway, bestGap = -99;
     for (const rwy of cfg.arrivals) {
-      const lead = arrivals.filter((o) => o !== a && o.mode === MODES.FINAL && o.runway === rwy).sort((x, y) => y.finalDistNm - x.finalDistNm)[0];
-      const gap = lead ? BASE_NM - lead.finalDistNm : 99;
+      const lead = arrivals.filter((o) => o !== a && (o.mode === MODES.FINAL || this.plan.get(o.id)?.state === 'released') && o.runway === rwy).sort((x, y) => y.finalDistNm - x.finalDistNm)[0];
+      let gap = lead ? BASE_NM - (lead.mode === MODES.FINAL ? lead.finalDistNm : BASE_NM + 8) : 99;
+      if ([...this.shift.aircraft.values()].some((o) => o.kind === 'DEP' && (o.mode === MODES.LUAW || o.mode === MODES.TAKEOFF) && o.runway === rwy)) gap -= 20; // a departure is using it
       if (gap > bestGap) { bestGap = gap; best = rwy; }
     }
     return best;
@@ -261,12 +262,14 @@ export class Bot {
     if (d.mode !== MODES.QUEUE && d.mode !== MODES.LUAW) return;
     const occupied = acs.some((o) => o !== d && o.onRunway === rw.physical && !(o.kind === 'DEP' && o.liftoffAt != null && o.rolledFt > 6500));
     const luawOthers = acs.some((o) => o !== d && o.kind === 'DEP' && o.mode === MODES.LUAW && o.runway === d.runway);
+    const arrivalRunway = s.config.arrivals.includes(d.runway);
     if (d.mode === MODES.QUEUE) {
-      // line up when the runway is free of other departures lining up and no arrival is inside 2 NM to this runway
-      const shortFinal = acs.some((o) => o.kind === 'ARR' && o.mode === MODES.FINAL && o.runway === d.runway && o.finalDistNm < 2.5);
+      // line up when the runway is free of other departures lining up and no arrival is inside 2.5 NM (8 NM on a runway arrivals use)
+      const shortFinal = acs.some((o) => o.kind === 'ARR' && o.mode === MODES.FINAL && o.runway === d.runway && o.finalDistNm < (arrivalRunway ? 8 : 2.5));
       if (!luawOthers && !occupied && !shortFinal) this.cmd(d, { type: 'luaw' });
       return;
     }
+    if (!d.clearedTakeoff && d.mode === MODES.LUAW && d.modeTimer > 150 && arrivalRunway) { this.cmd(d, { type: 'holdshort' }); return; } // give the runway back to the arrivals
     if (d.clearedTakeoff || !d.onRunway) return; // clear for takeoff only once lined up (the 20 s line-up would spoil the timing)
     // 1) same / close-parallel wake interval + SRS behind the previous departure; parallel release only on diverging courses (5-8-3)
     for (const o of acs) {

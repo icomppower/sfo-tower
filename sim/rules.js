@@ -81,9 +81,11 @@ export class Rules {
       if (this.radarOff) continue;
       const req = this.requiredNm(a, b, weather);
       const kind = req > RADAR_NM ? 'WAKE' : 'SEP_LOSS';
-      // aircraft in the same final stream are separated by distance only (both ride the same glidepath, ~950 ft per 3 NM)
+      // same final stream: the ~950 ft per 3 NM that the glidepath itself produces is not vertical separation — only the excess over the slope counts
       const sameStream = a.mode === MODES.FINAL && b.mode === MODES.FINAL && this.airport.sameOrCloseParallel(a.runway, b.runway);
-      if (req > 0 && (dv < VERTICAL_TOL_FT || sameStream) && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
+      const slopeDiff = sameStream ? Math.abs(a.finalDistNm - b.finalDistNm) * NM_FT * Math.tan(this.airport.ends[a.runway].gsDeg * Math.PI / 180) : 0;
+      const dvEff = Math.max(0, dv - slopeDiff);
+      if (req > 0 && dvEff < VERTICAL_TOL_FT && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
       else { this.clear(a, b, 'SEP_LOSS'); this.clear(a, b, 'WAKE'); }
     }
     // ---- runway events raised this step ----
@@ -98,7 +100,7 @@ export class Rules {
       if (!a.onRunway || !b.onRunway || a.onRunway === b.onRunway || a.clearedRunwayAt != null || b.clearedRunwayAt != null) continue;
       const sect = this.airport.intersecting(a.runway, b.runway); if (!sect) continue;
       const aBefore = a.alongRunwayFt < sect.fromThrFt[a.runway], bBefore = b.alongRunwayFt < sect.fromThrFt[b.runway];
-      const aMoving = a.mode === MODES.TAKEOFF || a.mode === MODES.ROLLOUT, bMoving = b.mode === MODES.TAKEOFF || b.mode === MODES.ROLLOUT;
+      const aMoving = (a.mode === MODES.TAKEOFF || a.mode === MODES.ROLLOUT) && a.ias > 5, bMoving = (b.mode === MODES.TAKEOFF || b.mode === MODES.ROLLOUT) && b.ias > 5; // stopped = holding short
       if (aBefore && bBefore && aMoving && bMoving && a.liftoffAt == null && b.liftoffAt == null) this.raise(shift, 'CROSSING_CONFLICT', a, b, { how: 'both rolling toward the intersection' });
     }
     // ---- same runway occupancy: two on one physical runway where neither is legally separated (incursion) ----

@@ -7,7 +7,7 @@
 | T2 Airport geometry | PASS | 2026-09-27 | Airport geometry — thr 0.000 m, hdg 0.00°, OurAirports 1.9 m, CIFP 0.16 m (10 checks, 0 failed) (negatives 4/4) |
 | T3 Flight model | PASS | 2026-09-27 | Flight model — 10 types × approach speed / glideslope / TCH / turns / climb (61 checks, 0 failed) (negatives 6/6) |
 | T4 Separation rules | PASS | 2026-09-27 | Separation rules — 38 scenarios (legal + illegal), radar / wake / same-runway / crossing / collision (38 checks, 0 failed) (negatives 5/5) |
-| T5 SFO runway ops | — | | |
+| T5 SFO runway ops | PASS | 2026-09-27 | SFO runway ops — 18 crossing / occupancy scenarios + bot shift (20 checks, 0 failed) (negatives 3/3) |
 | T6 Weather | — | | |
 | T7 Bot shift | — | | |
 | T8 UI | — | | |
@@ -15,4 +15,4 @@
 
 ## Current
 
-T0–T4 green (2026-09-26). Bot (sim/bot.js, fix-stack release flow) clean under light traffic, loses separation above ~20 arrivals/h — being fixed for T6/T7. Next: T5 crossing-runway gate.
+T0–T5 green (2026-09-26). Bot: clean under light traffic; release throughput collapses above ~25 arrivals/h (being fixed before T6/T7).
