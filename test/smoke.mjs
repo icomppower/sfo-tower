@@ -1,0 +1,14 @@
+import { loadData } from '../sim/load-node.js';
+import { Shift } from '../sim/shift.js';
+const data = loadData();
+const t0 = Date.now();
+const s = new Shift(data, { seed: process.argv[2] ?? 'smoke', difficulty: 'normal', weather: process.argv[3] ?? 'auto', durationMin: 60 });
+console.log('config', s.config.id, 'month', s.month, 'dow', s.dow, 'startHour', s.startHour, '\nATIS', s.weather.atis());
+console.log('intersections', s.airport.intersections.map((i) => i.runways.join('x') + ' ' + JSON.stringify(Object.fromEntries(Object.entries(i.fromThrFt).map(([k, v]) => [k, Math.round(v)])))).join(' | '));
+console.log('close parallels', JSON.stringify(s.airport.closeParallels));
+console.log('scheduled', s.traffic.schedule.length, 'initial aircraft', s.aircraft.size);
+s.step(3600);
+const counts = {}; for (const e of s.events) counts[e.type] = (counts[e.type] ?? 0) + 1;
+console.log('events', counts);
+console.log('score', s.scoring.summary(), 'hash', s.hash, 'ms', Date.now() - t0);
+const snap = s.snapshot(); console.log('remaining', snap.aircraft.length, snap.aircraft.slice(0, 8).map((a) => `${a.cs} ${a.mode} ${a.alt}ft ${a.ias}kt r=${Math.hypot(a.x, a.y).toFixed(1)}`).join(' | '));
