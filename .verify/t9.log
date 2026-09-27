@@ -1,0 +1,15 @@
+  neg caught  a blank canvas is caught by the variance check
+  neg caught  two identical scenes are caught by the difference check
+  ok   day: shift running with traffic on the scope, no errors (VISUAL, 17 aircraft, 3 on final, t=1501)
+  ok   day: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":9.9,"std":21},"surface":{"mean":16.6,"std":17.6}}
+  ok   day: screenshot written shots/day.png (205 KB)
+  ok   fog: shift running with traffic on the scope, no errors (INSTRUMENT, 8 aircraft, 1 on final, t=1501)
+  ok   fog: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":25.2,"std":14.5},"surface":{"mean":58.8,"std":10.5}}
+  ok   fog: screenshot written shots/fog.png (171 KB)
+  ok   night: shift running with traffic on the scope, no errors (VISUAL, 8 aircraft, 4 on final, t=1501)
+  ok   night: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":8.4,"std":15.3},"surface":{"mean":16.5,"std":17.4}}
+  ok   night: screenshot written shots/night.png (178 KB)
+  ok   fog scene is recognised as fog (haze overlay) and night scene as night — fog look {"night":false,"fog":true,"localHour":"07:00"}, night look {"night":true,"fog":false,"localHour":"11:00"}
+  ok   the three looks differ (mean brightness of the surface map) — day 16.6, fog 58.8, night 16.5
+NEGATIVE 2/2
+PASS T9 Look (advisory) — shots/day.png, fog.png, night.png for human review (11 checks, 0 failed)

@@ -20,7 +20,8 @@ export class Scope {
   hit(px, py) { let best = null, bd = 26; for (const a of this.shift.aircraft.values()) { if (a.done) continue; const p = this.toPx(a); const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = a; } } return best; }
   draw(frac, conflicts) {
     const g = this.g, s = this.shift, ap = s.airport; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); g.clearRect(0, 0, this.w, this.h);
-    g.fillStyle = '#050b12'; g.fillRect(0, 0, this.w, this.h);
+    const look = this.look ?? {}; g.fillStyle = look.night ? '#02060b' : '#050b12'; g.fillRect(0, 0, this.w, this.h);
+    if (look.fog) { g.fillStyle = 'rgba(120,135,150,0.10)'; g.fillRect(0, 0, this.w, this.h); }
     const sc = this.scale(); const c0 = this.toPx({ x: 0, y: 0 });
     // range rings + labels
     g.strokeStyle = '#13263a'; g.lineWidth = 1; g.fillStyle = '#2d4a63'; g.font = '11px system-ui';
@@ -55,6 +56,7 @@ export class Scope {
       g.fillText(l1, p.x + ox, p.y + oy); g.fillText(l2, p.x + ox, p.y + oy + 12); g.fillText(l3, p.x + ox, p.y + oy + 24); g.textAlign = 'start';
     }
     // wind / config corner
+    if (look.night) { g.fillStyle = '#ffd166'; g.font = '11px system-ui'; g.fillText('NIGHT ' + (look.localHour ?? ''), this.w - 70, 20); }
     g.fillStyle = '#8fa3b8'; g.font = '12px system-ui'; const w = s.weather.current.wind;
     g.fillText(`${s.config.name} · ${s.weather.current.conditions} · wind ${w.dir == null ? 'VRB' : String(w.dir).padStart(3, '0')}/${w.kt}${w.gust ? 'G' + w.gust : ''}`, 8, this.h - 8);
   }

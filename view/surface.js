@@ -9,7 +9,7 @@ export class Surface {
   hit(px, py) { let best = null, bd = 22; for (const a of this.shift.aircraft.values()) { if (a.done) continue; const p = this.toPx(a); const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = a; } } return best; }
   draw(frac) {
     const g = this.g, s = this.shift, ap = s.airport; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); g.clearRect(0, 0, this.w, this.h);
-    g.fillStyle = '#08131c'; g.fillRect(0, 0, this.w, this.h); const sc = this.scale();
+    const look = this.look ?? {}; g.fillStyle = look.night ? '#040a10' : look.fog ? '#151d24' : '#08131c'; g.fillRect(0, 0, this.w, this.h); const sc = this.scale();
     // bay water hint (east/south-east of the field) and runways
     g.fillStyle = '#0b2033'; g.beginPath(); const bx = this.toPx({ x: 1.6, y: -0.2 }); g.moveTo(bx.x, -10); g.lineTo(this.w + 10, -10); g.lineTo(this.w + 10, this.h + 10); g.lineTo(bx.x - 0.9 * sc, this.h + 10); g.closePath(); g.fill();
     const occupied = new Set(); for (const a of s.aircraft.values()) if (a.onRunway && !a.done && a.clearedRunwayAt == null) occupied.add(a.onRunway);
@@ -32,6 +32,8 @@ export class Surface {
         const q = this.toPx(a); g.strokeStyle = col; g.lineWidth = sel ? 2 : 1; g.beginPath(); g.rect(q.x - 4, q.y - 4, 8, 8); g.stroke(); g.font = '11px ui-monospace, monospace'; g.fillStyle = col; g.fillText(`${a.callsign} ${a.finalDistNm.toFixed(1)}NM ${Math.round(a.alt / 100)}`, q.x + 8, q.y + 4);
       }
     }
+    if (look.fog) { g.fillStyle = 'rgba(150,160,170,0.22)'; g.fillRect(0, 0, this.w, this.h); g.fillStyle = '#b8c4cf'; g.font = '11px system-ui'; g.fillText(`FOG · vis ${s.weather.current.vis ?? '?'} SM · ceiling ${s.weather.current.ceil ?? '—'}`, this.w - 190, 20); }
+    if (look.night) { g.fillStyle = '#ffd166'; for (const rw of Object.values(ap.runways)) { const a = this.toPx(rw.a), b = this.toPx(rw.b); for (let i = 0; i <= 12; i++) { const x = a.x + (b.x - a.x) * i / 12, y = a.y + (b.y - a.y) * i / 12; g.fillRect(x - 1, y - 1, 2, 2); } } } // runway edge lights
     g.fillStyle = '#8fa3b8'; g.font = '11px system-ui'; g.fillText(`arr ${s.config.arrivals.join('/')} · dep ${s.config.departures.join('/')} · heavies ${s.config.heavyDepartures.join('/')}`, 8, this.h - 8);
   }
 }

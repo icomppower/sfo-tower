@@ -91,6 +91,8 @@ function frame(now) {
     if (s.finished || s.gameOver) { drainEvents(); endShift(); }
   }
   computeConflicts();
+  const localHour = Math.floor(((s.weather.t0 + s.t) / 3600 - 8) % 24 + 24) % 24; const look = { night: qs.has('night') || localHour >= 19 || localHour < 6, fog: s.weather.current.conditions !== 'VISUAL' && s.weather.current.fog, localHour: String(localHour).padStart(2, '0') + ':00' };
+  state.scope.look = look; state.surface.look = look;
   state.scope.selected = state.selected; state.surface.selected = state.selected;
   state.scope.draw(state.paused ? 0 : state.acc, state.conflicts); state.surface.draw(state.paused ? 0 : state.acc);
   updateHud(); if (state.selected && !s.aircraft.get(state.selected)) { state.selected = null; renderCmdBar(); }
