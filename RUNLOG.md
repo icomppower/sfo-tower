@@ -25,3 +25,4 @@ One line per `./verify.sh` run, appended automatically.
 - 2026-09-27T07:05Z — t8 FAIL (neg 3/4); 
 - 2026-09-27T07:06Z — t8 PASS (neg 4/4); 
 - 2026-09-27T07:07Z — t9 PASS (neg 2/2); 
+- 2026-09-27T07:09Z — t0 PASS (neg 4/4); t1 PASS (neg 4/4); t2 PASS (neg 4/4); t3 PASS (neg 6/6); t4 PASS (neg 5/5); t5 PASS (neg 3/3); t6 PASS (neg 3/3); t7 PASS (neg 3/3); t8 PASS (neg 4/4); t9 PASS (neg 2/2); 

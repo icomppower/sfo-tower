@@ -15,4 +15,6 @@
 
 ## Current
 
-T0–T7 green (2026-09-26) once the full ladder run below confirms. Bot = landing-slot sequencer (sim/bot.js). Next: T8 UI (radar scope + surface map + command menu, zh/en, 390×844 / 844×390 / 1440×900), then T9 look, deploy, Notion status page.
+**DONE 2026-09-27.** T0–T8 green (T9 advisory green) in one clean `./verify.sh` run; deployed to GitHub Pages (icomppower.github.io/sfo-tower); status page under the Notion SPEC; row added to the Live Projects Bookmark.
+
+Known gaps, documented rather than hidden: the bot controller reaches ≈ 70 % of the FAA capacity profile's called rates (D25); runway configuration is fixed per shift (D18); climb/descent rates are class assumptions (D21); international traffic is a modelled share on top of BTS (D15). Phase 2 (3D tower-cab view on Harbor Engine) is a separate SPEC (§8).

@@ -1,7 +1,7 @@
   neg caught  a blank canvas is caught by the variance check
   neg caught  two identical scenes are caught by the difference check
   ok   day: shift running with traffic on the scope, no errors (VISUAL, 17 aircraft, 3 on final, t=1501)
-  ok   day: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":9.9,"std":21},"surface":{"mean":16.6,"std":17.6}}
+  ok   day: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":9.9,"std":21.2},"surface":{"mean":16.6,"std":17.6}}
   ok   day: screenshot written shots/day.png (205 KB)
   ok   fog: shift running with traffic on the scope, no errors (INSTRUMENT, 8 aircraft, 1 on final, t=1501)
   ok   fog: scope and surface drawn (pixel variance > 4) — {"scope":{"mean":25.2,"std":14.5},"surface":{"mean":58.8,"std":10.5}}
