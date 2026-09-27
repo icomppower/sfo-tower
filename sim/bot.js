@@ -174,7 +174,7 @@ export class Bot {
         const W = advance({ x: 0, y: 0 }, rw.finalCourse + 180 + p.side * 90, 7);
         this.cmd(a, { type: 'direct', points: [{ ...W, fix: 'ABEAM' }, p.fix] }); setSpeed(190);
       }
-      if (a.routeIdx === 0 && a.route.length === 2) { if (a.tgt.alt < 5000) setAlt(5000); } else setAlt(this.stackLevelFor(a, p));
+      setAlt(this.stackLevelFor(a, p));
       if (dist(a, p.fix) > 2.5) return;
       p.state = 'star';
     }
@@ -222,7 +222,9 @@ export class Bot {
     const paired = (x) => this.slots.some((y) => y !== x && y.t < x.t && x.t - y.t < 95);
     const gapS = (lead, leadRwy, trail, rwy, leadSlot) => Math.max(this.spacingFor(lead, leadRwy, trail, rwy) / Math.min(170, trail.perf.vApp + 30, lead.perf.vApp + 30) * 3600, depsWaiting && leadSlot && paired(leadSlot) ? 95 : 0);
     let best = null;
-    for (const runway of cfg.arrivals) {
+    // runways by side of the final (D23): south-side fixes → first arrival runway (28L), north-side → second (28R); pairs then converge only at the staggered join
+    const sideRunway = cfg.arrivals.length > 1 ? [cfg.arrivals[p.side > 0 ? 0 : 1]] : cfg.arrivals;
+    for (const runway of sideRunway) {
       const rw = ap.ends[runway]; const { cross, along } = trackOffsets(rw.thr, rw.finalCourse + 180, a);
       let route, pathLen, alongT;
       const direct = along < 26 && along > 12 && Math.abs(cross) <= 8 && along - Math.abs(cross) / Math.tan(30 * Math.PI / 180) >= 12;
@@ -245,7 +247,7 @@ export class Bot {
     }
     const wait = best.tSlot - best.tE;
     if (wait > 60) { this.note('slotWait'); return null; } // more than a minute early: hold at the fix rather than fly a wide dogleg
-    const joinAlt = cfg.arrivals.indexOf(best.runway) <= 0 ? 4000 : 5000; // stagger the parallels: first arrival runway 4,000, second 5,000 until established (visual pairs)
+    const joinAlt = cfg.arrivals.indexOf(best.runway) <= 0 ? 4000 : 6000; // stagger the parallels: first arrival runway 4,000, second 6,000 (it meets the glideslope only after both are established)
     // dogleg: extra path E = wait × 190 kt as a lateral offset at the midpoint of the first leg (outward, away from the final axis)
     const E = wait * GS_TRANSIT / 3600; const route = [...best.route];
     const first = route[0]; const L = dist(a, first);
@@ -283,8 +285,9 @@ export class Bot {
     this.stackBaseByKey ??= {}; this.stackBaseByKey[key] = Math.max(this.stackBaseByKey[key] ?? 0, p.stackBase); p.stackBase = this.stackBaseByKey[key];
     if (i >= 0) { // holder: its level, but step down only once the holder below has settled at its own level
       const level = Math.min(13000, p.stackBase + 1000 * i);
-      if (i > 0) { const below = this.shift.aircraft.get(st[i - 1]); const belowLevel = Math.min(13000, p.stackBase + 1000 * (i - 1)); if (below && Math.abs(below.alt - belowLevel) > 150 && level < a.tgt.alt) return a.tgt.alt; }
-      return level;
+      let floor = level;
+      for (let k = 0; k < i; k++) { const o = this.shift.aircraft.get(st[k]); if (o) floor = Math.max(floor, Math.ceil((o.alt + 950) / 1000) * 1000); } // never below 1,000 ft above any holder under us
+      return Math.min(13000, floor);
     }
     // inbound: above the highest holder (actual altitude or level) and above every other inbound closer to this fix
     let top = p.stackBase - 1000;
@@ -440,9 +443,9 @@ export class Bot {
   initialCourse(d) { const rw = this.shift.airport.ends[d.runway]; const f = d.sid?.route?.[0]; return f ? bearingTo(rw.thr, f) : rw.hdg; }
   /** Keep a climbing departure 1,000 ft under any arrival within 6 NM (then let it climb). */
   capDeparture(d, acs) {
-    const r = Math.hypot(d.x, d.y); if (r > 14) { if (d.tgt.altAssigned && d.tgt.alt < 10000) this.cmd(d, { type: 'altitude', alt: 10000 }); return; }
+    const r = Math.hypot(d.x, d.y); if (r > 18) { if (d.tgt.altAssigned && d.tgt.alt < 10000) this.cmd(d, { type: 'altitude', alt: 10000 }); return; }
     let cap = 10000;
-    for (const o of acs) { if (o.kind !== 'ARR' || o.onGround) continue; if (dist(o, d) < 6 && o.alt > d.alt - 500) cap = Math.min(cap, Math.max(3000, Math.floor((o.alt - 1000) / 1000) * 1000)); }
+    for (const o of acs) { if (o.kind !== 'ARR' || o.onGround) continue; if (dist(o, d) < 7 && o.alt > d.alt - 500) cap = Math.min(cap, Math.max(3000, Math.floor((o.alt - 1000) / 1000) * 1000)); }
     if (cap < d.tgt.alt && (cap < d.alt + 300 || cap <= 4000)) this.cmd(d, { type: 'altitude', alt: cap });
     else if (cap === 10000 && d.tgt.alt < 10000) this.cmd(d, { type: 'altitude', alt: 10000 });
   }
