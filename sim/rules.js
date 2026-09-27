@@ -38,6 +38,8 @@ export class Rules {
   }
   clear(a, b, kind) { this.active.delete(this.key(a, b, kind)); }
 
+  /** A departure's assigned course: the SID's first fix bearing from its runway (5-8-3 "courses diverge"), else its heading. */
+  departureCourse(d) { const rw = this.airport.ends[d.runway]; const f = d.sid?.route?.[0]; if (d.tgt.hdgAssigned) return d.tgt.hdg; return f && rw ? Math.atan2(f.x - rw.thr.x, f.y - rw.thr.y) * 180 / Math.PI : d.hdg; }
   /** Required lateral separation between two airborne aircraft, or 0 if none applies (visual/tower separation). */
   requiredNm(a, b, weather) {
     const ap = this.airport;
@@ -45,7 +47,9 @@ export class Rules {
     const finalRelated = bothFinal && ap.sameOrCloseParallel(a.runway, b.runway);
     const near = (x) => Math.hypot(x.x, x.y) < 6 && x.alt < ap.elevFt + 3000;
     // tower-applied visual separation between a departure in the initial climb and other low traffic near the field (7-2-1); crossing protection covers 1s vs 28s.
-    if ((a.kind === 'DEP' && (a.mode === MODES.CLIMB || a.mode === MODES.TAKEOFF || (a.mode === MODES.SID && near(a))) && near(b)) || (b.kind === 'DEP' && (b.mode === MODES.CLIMB || b.mode === MODES.TAKEOFF || (b.mode === MODES.SID && near(b))) && near(a))) return 0;
+    const nearGA = (x) => Math.hypot(x.x, x.y) < 8 && x.alt < ap.elevFt + 3500;
+    const climbing = (x) => (x.kind === 'DEP' && (x.mode === MODES.CLIMB || x.mode === MODES.TAKEOFF || (x.mode === MODES.SID && near(x)))) || (x.mode === MODES.GOAROUND && nearGA(x));
+    if ((climbing(a) && (near(b) || (a.mode === MODES.GOAROUND && nearGA(b)))) || (climbing(b) && (near(a) || (b.mode === MODES.GOAROUND && nearGA(a))))) return 0; // tower-applied visual separation in the initial climb / missed approach (7-2-1)
     // arrival within 1 NM of touchdown vs the departure that just rolled: runway rules apply, not radar
     if ((a.mode === MODES.FINAL && a.finalDistNm < 1.5 && near(b)) || (b.mode === MODES.FINAL && b.finalDistNm < 1.5 && near(a))) return 0;
     let req;
@@ -61,7 +65,7 @@ export class Rules {
     }
     req = RADAR_NM;
     // 5-8-3: successive/simultaneous departures on courses diverging ≥ 15° need 1 NM (SFO releases 1L/1R together)
-    if (a.kind === 'DEP' && b.kind === 'DEP' && Math.hypot(a.x, a.y) < 12 && Math.hypot(b.x, b.y) < 12 && Math.abs(angDiff(a.hdg, b.hdg)) >= 15) req = 1;
+    if (a.kind === 'DEP' && b.kind === 'DEP' && Math.hypot(a.x, a.y) < 12 && Math.hypot(b.x, b.y) < 12 && Math.abs(angDiff(this.departureCourse(a), this.departureCourse(b))) >= 15) req = 1;
     // wake "directly behind" (5-5-4 g1): within 2,500 ft of the leader's track, behind, less than 1,000 ft below
     for (const [lead, trail] of [[a, b], [b, a]]) {
       const { cross, along } = trackOffsets(lead, lead.hdg, trail);

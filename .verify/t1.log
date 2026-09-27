@@ -2,7 +2,7 @@
   neg caught  a Math.random() leak into the RNG is caught
   neg caught  sim/ importing the DOM is caught
   neg caught  a modified classic file is caught
-  ok   60-min seeded shift replays byte-identical (hash + snapshot) — 9115c045 284 events
+  ok   60-min seeded shift replays byte-identical (hash + snapshot) — 5cd3dede 135 events
   ok   different seeds diverge
   ok   sim/ is zero-DOM (no document/window/navigator/localStorage/rAF/Date.now/Math.random)
   ok   sim runs in the browser too: sim files never import node:
@@ -11,7 +11,7 @@
   ok   classic/index.html byte-identical to the pinned original
   ok   classic/style.css byte-identical to the pinned original
   ok   index.html redirects ?classic to classic/
-  ok   ?classic lands on classic/index.html with the original query hooks — http://127.0.0.1:59619/classic/index.html?&play&ff=15&apt=SFO&debug
+  ok   ?classic lands on classic/index.html with the original query hooks — http://127.0.0.1:60199/classic/index.html?&play&ff=15&apt=SFO&debug
   ok   classic game runs: state=play, time advanced ≥ 10 s, aircraft present, no page errors — s=play t=17.5 n=4 sc=0 apt=SFO stg=1 ld=0 errors=0
 NEGATIVE 4/4
-PASS T1 Sim split — hash 9115c045 ×2, 284 events, classic byte-identical + playable (11 checks, 0 failed)
+PASS T1 Sim split — hash 5cd3dede ×2, 135 events, classic byte-identical + playable (11 checks, 0 failed)

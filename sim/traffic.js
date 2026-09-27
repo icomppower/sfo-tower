@@ -29,15 +29,16 @@ const SID_BY_RUNWAY = { '1L': [['SSTIK5', 4], ['SEGUL1', 3], ['GAPP7', 1]], '1R'
 export const DIFFICULTY = { easy: { rate: 0.55, intl: 0.08, assist: true }, normal: { rate: 0.85, intl: 0.12, assist: true }, hard: { rate: 1.15, intl: 0.16, assist: false } };
 
 export class Traffic {
-  constructor({ rng, trafficJson, perf, procedures, airport, config, difficulty, month, dow, startHour, durationS }) {
-    Object.assign(this, { rng, perf, procedures, airport, config, difficulty: DIFFICULTY[difficulty], startHour, durationS, nextId: 1 });
+  constructor({ rng, trafficJson, perf, procedures, airport, config, difficulty, month, dow, startHour, durationS, demand = null }) {
+    Object.assign(this, { rng, perf, procedures, airport, config, difficulty: DIFFICULTY[difficulty], startHour, durationS, nextId: 1, demand });
     const prof = trafficJson.months[String(month)][String(dow)];
     this.arrPerHour = prof.arrPerHour; this.depPerHour = prof.depPerHour;
     this.carrierShares = Object.entries(trafficJson.carriers).filter(([c]) => CARRIERS[c]).map(([c, n]) => [c, n]);
     this.schedule = []; // { t, kind }
     this.buildSchedule();
   }
-  rateAt(kind, simT) { // flights per hour (BTS shape × difficulty, + international share, + GA)
+  rateAt(kind, simT) { // flights per hour (BTS shape × difficulty, + international share, + GA); `demand` overrides for capacity tests
+    if (this.demand) return kind === 'ARR' ? this.demand.arr : this.demand.dep;
     const h = Math.floor((this.startHour * 3600 + simT) / 3600) % 24;
     const base = (kind === 'ARR' ? this.arrPerHour : this.depPerHour)[h];
     const intl = 1 + this.difficulty.intl * (h >= 16 || h <= 1 ? 1.6 : 0.6);
@@ -63,6 +64,8 @@ export class Traffic {
   spawn(shift) {
     while (this.schedule.length && this.schedule[0].t <= shift.t) {
       const s = this.schedule[0];
+      // en-route metering (D22, TBFM-style): no new arrival while ≥ 6 arrivals are airborne and not yet on the approach
+      if (s.kind === 'ARR' && shift.t > 0 && [...shift.aircraft.values()].filter((o) => o.kind === 'ARR' && !o.done && !o.onGround && o.mode !== 'FINAL' && o.mode !== 'APPROACH').length >= 6) { s.t = shift.t + 30; this.schedule.sort((a, b) => a.t - b.t); break; }
       const ac = s.kind === 'ARR' ? this.makeArrival(shift, s.t) : this.makeDeparture(shift, s.t);
       // keep new arrivals 3 NM / 1,000 ft from everyone and ≥ 7 NM behind the previous arrival on the same STAR (wake behind heavies, 5-5-4 TBL 5-5-1)
       if (ac.kind === 'ARR' && [...shift.aircraft.values()].some((o) => !o.done && !o.onGround && ((dist(o, ac) < 3 && Math.abs(o.alt - ac.alt) < 1000) || (o.kind === 'ARR' && o.star === ac.star && dist(o, ac) < 7)))) { s.t = shift.t + 45; this.nextId--; this.schedule.sort((a, b) => a.t - b.t); continue; }

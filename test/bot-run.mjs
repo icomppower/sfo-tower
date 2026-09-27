@@ -4,7 +4,7 @@ import { Shift } from '../sim/shift.js';
 import { Bot } from '../sim/bot.js';
 const [seed = 'bot', difficulty = 'easy', weather = 'clear', minutes = '60'] = process.argv.slice(2);
 const verbose = process.argv.includes('--verbose');
-const s = new Shift(loadData(), { seed, difficulty, weather, durationMin: +minutes });
+const s = new Shift(loadData(), { seed, difficulty, weather, durationMin: +minutes, startHour: process.env.STARTHOUR ? +process.env.STARTHOUR : null, demand: process.env.DEMAND ? { arr: +process.env.DEMAND, dep: +process.env.DEMAND } : null });
 const bot = new Bot(s);
 const t0 = Date.now();
 const snaps = new Map(); const VIOL = new Set(['SEP_LOSS', 'WAKE', 'RUNWAY_INCURSION', 'CROSSING_CONFLICT', 'COLLISION', 'GO_AROUND']);

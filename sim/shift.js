@@ -29,7 +29,7 @@ export class Shift {
     const localH = ((this.weather.t0 - 8 * 3600) / 3600) % 24;
     this.dow = o.dow ?? ((wxDate.getUTCDay() + 6) % 7) + 1;
     this.startHour = o.startHour ?? Math.floor(((localH % 24) + 24) % 24);
-    this.traffic = new Traffic({ rng: this.rng.fork('traffic'), trafficJson: data.traffic, perf: this.perf, procedures: this.procedures, airport: this.airport, config: this.config, difficulty: o.difficulty, month: this.month, dow: this.dow, startHour: this.startHour, durationS: this.durationS });
+    this.traffic = new Traffic({ rng: this.rng.fork('traffic'), trafficJson: data.traffic, perf: this.perf, procedures: this.procedures, airport: this.airport, config: this.config, difficulty: o.difficulty, month: this.month, dow: this.dow, startHour: this.startHour, durationS: this.durationS, demand: o.demand ?? null });
     this.rules = new Rules(this.airport, o.rules);
     this.scoring = new Scoring();
     this.assist = DIFFICULTY[o.difficulty].assist && o.assist !== false;
@@ -43,12 +43,12 @@ export class Shift {
     for (let i = 0; i < seconds; i++) {
       if (this.finished || this.scoring.gameOver) return;
       this.t += 1; this.stepCount++;
-      const before = this.events.length;
+      const before = this.scoredIdx ?? 0; // score everything since the last step, including commands issued between steps
       this.env.t = this.t; this.env.weather = this.weather.update(this.t); this.env.wind = this.env.weather.wind;
       this.traffic.spawn(this);
       for (const a of this.aircraft.values()) if (!a.done) a.step(1, this.env);
       this.rules.check(this);
-      this.scoring.apply(this.events.slice(before), this);
+      this.scoring.apply(this.events.slice(before), this); this.scoredIdx = this.events.length;
       for (const [id, a] of this.aircraft) if (a.done && this.t - (a.doneAt ?? (a.doneAt = this.t)) > 30) this.aircraft.delete(id);
       this.mix();
       if (this.t >= this.durationS) this.finished = true;
