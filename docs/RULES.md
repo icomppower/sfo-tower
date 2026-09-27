@@ -745,6 +745,86 @@ Quoted from the FAA HTML edition cached in `data/raw/faa-7110/` (checksums in `d
 
 **Sim:** Radar minima: 3 NM terminal (2.5 NM inside 10 NM on final with documented runway occupancy ≤ 50 s); CWT wake matrices TBL 5-5-1 (directly behind) and TBL 5-5-2 (on approach, measured at the threshold).
 
+## 5-8-3
+
+> 5-8-3. SUCCESSIVE OR SIMULTANEOUS DEPARTURES
+> TERMINAL
+> Separate aircraft departing from the same airport/heliport/vertiport or adjacent airports/heliports/vertiports in accordance with the following minima provided radar identification with the aircraft will be established within 1 mile of the takeoff runway end/helipad/vertipad and courses will diverge by at least the minimum required, as stated below.
+> REFERENCE-
+> FAA Order JO 7110.65, Para 3-9-7, Wake Turbulence Separation for Intersection Departures.
+> FAA Order JO 7110.65, Para 3-9-8, Intersecting Runway/Intersecting Flight Path Operations.
+> FAA Order JO 7110.65, Para 5-5-4, Minima, Subpara g.
+> NOTE-
+> FAA Order 8260.46, Departure Procedure (DP) Program, and FAA Order 8260.3, United States Standard for Terminal Instrument Procedures (TERPS), Volume 4, establishes guidelines for IFR departure turning procedures which assumes a climb to 400 feet above the departure end of runway (DER) elevation before a turn is commenced. TERPS criteria ensures obstacle clearance with a climb gradient of 200 feet per nautical mile from the DER. “Immediately after departure” is considered to be any turn that provides at least the minimum required divergence that commences no later than 2 miles from the DER.
+> Consider known aircraft performance characteristics when applying initial separation to successive departing aircraft.
+> When one or both of the departure surfaces is a helipad/vertipad, use the takeoff course as a reference, comparable to the centerline of a runway and the helipad/vertipad center as the threshold.
+> Between successive departures from the same runway/helipad/vertipad or parallel runways/takeoff courses separated by less than 2,500 feet- 1 mile if courses diverge by 15 degrees or more immediately after departure. (See FIG 5-8-1, FIG 5-8-2, and FIG 5-8-3.)
+> FIG 5-8-1Successive Departures
+> FIG 5-8-2Simultaneous Departures
+> FIG 5-8-3Simultaneous Departures
+> NOTE-
+> This procedure does not apply when wake turbulence separation is required.
+> Between simultaneous departures departing in the same direction from parallel runways/takeoff courses, authorize simultaneous takeoffs if the centerlines/takeoff courses are separated by at least 2,500 feet and courses diverge by 15 degrees or more immediately after departure. (See FIG 5-8-5, and FIG 5-8-6.)
+> REFERENCE-
+> FAA Order JO 7110.65, Para 5-5-4, Minima, Subparagraph f.
+> When both aircraft are flying an RNAV SID:
+> Between successive departures from the same runway– 1 mile if courses diverge by 10 degrees or more immediately after departure. (See FIG 5-8-1.)
+> NOTE-
+> This procedure does not apply when wake turbulence separation is required.
+> Between simultaneous departures from parallel runways/takeoff courses, authorize simultaneous takeoffs if the centerlines/takeoff courses are separated by at least 700 feet and less than 2,500 feet, courses diverge by 15 degrees or more, and departures are released in accordance with the release distance stagger stated in TBL 5-8-1 below.
+> TBL 5-8-1Departure Release Distances
+> Distance to Divergence
+> (Measured from the further DER)
+>  | 
+> Minimum Centerline Separation
+>  | 
+> Release Distance Stagger
+>  | 
+> Immediately
+>  | 
+> 700
+>  | 
+> 1000 feet
+>  | 
+> No later than 5 NM
+>  | 
+> 1020
+>  | 
+> 2000 feet
+>  | 
+> No later than 8 NM
+>  | 
+> 1130
+>  | 
+> 3000 feet
+>  | 
+> No later than 11 NM
+>  | 
+> 1360
+>  | 
+> 4000 feet
+>  | 
+> NOTE-
+> This procedure does not apply when wake turbulence separation is required.
+> FIG 5-8-4Simultaneous Dependent Departures
+> Between simultaneous departures from parallel runways/takeoff courses, authorize simultaneous takeoffs if the centerlines/takeoff courses are separated by at least 2,500 feet and courses diverge by 10 degrees or more immediately after departure. (See FIG 5-8-5, and FIG 5-8-6.)
+> NOTE-
+> RNAV SIDs specific to this paragraph are those SIDs constructed with a specific lateral path that begins at the DER.
+> FIG 5-8-5Parallel Runway Departures
+> FIG 5-8-6Parallel Helipad/Vertipad Course Departures
+> Between aircraft departing from diverging runways:
+> Nonintersecting runways. Authorize simultaneous takeoffs if runways diverge by 15 degrees or more. (See FIG 5-8-7.)
+> FIG 5-8-7Nonintersecting Runway Departures
+> Intersecting runways and/or takeoff courses that diverge by 15 degrees or more. Authorize takeoff of a succeeding aircraft when the preceding aircraft has passed the point of runway and/or takeoff course intersection. When applicable, apply the procedure in paragraph 3-9-5, Anticipating Separation. (See FIG 5-8-8 and FIG 5-8-9.)
+> FIG 5-8-8Intersecting Runway Departures
+> FIG 5-8-9Intersecting Helipad/Vertipad Course Departures
+> NOTE-
+> This procedure does not apply when wake turbulence separation is required.
+> REFERENCE-
+> FAA Order JO 7110.65, Para 5-5-4, Minima, Subparagraph f.
+
+**Sim:** Successive or simultaneous departures: 1 NM between departures whose courses diverge by 15° or more immediately after takeoff (SFO releases 1L and 1R together on diverging SIDs); otherwise 3 NM radar applies.
+
 ## 5-5-5
 
 > 5-5-5. VERTICAL APPLICATION

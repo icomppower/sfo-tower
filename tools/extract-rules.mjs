@@ -11,6 +11,7 @@ const text = (p) => readFileSync(join(RAW, 'faa-7110', p + '.html'), 'utf8')
   .replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n');
 const para = (t, id, next) => { const i = t.indexOf(id + '.'); const j = t.indexOf(next + '.', i + 1); return t.slice(i, j > 0 ? j : i + 6000).trim(); };
 const ed = text('chap0_section_0').match(/7110\.65[A-Z]{1,2}/)[0];
+const c58 = text('chap5_section_8');
 const c2 = text('chap2_section_1'), c39 = text('chap3_section_9'), c310 = text('chap3_section_10'), c55 = text('chap5_section_5'), c72 = text('chap7_section_2');
 const sections = [
   ['2-1-19', para(c2, '2-1-19', '2-1-20'), 'sim/rules.js applies wake separation to touchdown for IFR arrivals not on a visual approach.'],
@@ -20,6 +21,7 @@ const sections = [
   ['3-10-3', para(c310, '3-10-3', '3-10-4'), 'Same-runway arrival separation: threshold crossing only when the runway is clear or the SRS distance exists (3,000 / 4,500 / 6,000 ft).'],
   ['3-10-4', para(c310, '3-10-4', '3-10-5'), 'Intersecting-runway arrival separation: an arrival may not cross the threshold until the departing aircraft has passed the intersection or is airborne and turning away.'],
   ['5-5-4', para(c55, '5-5-4', '5-5-5'), 'Radar minima: 3 NM terminal (2.5 NM inside 10 NM on final with documented runway occupancy ≤ 50 s); CWT wake matrices TBL 5-5-1 (directly behind) and TBL 5-5-2 (on approach, measured at the threshold).'],
+  ['5-8-3', para(c58, '5-8-3', '5-8-4'), 'Successive or simultaneous departures: 1 NM between departures whose courses diverge by 15° or more immediately after takeoff (SFO releases 1L and 1R together on diverging SIDs); otherwise 3 NM radar applies.'],
   ['5-5-5', para(c55, '5-5-5', '5-5-6'), 'Vertical separation 1,000 ft below FL 410 is an alternative to radar separation.'],
   ['7-2-1', para(c72, '7-2-1', '7-2-2'), 'Visual separation in VMC may substitute for radar separation between arrivals in the tower environment (assist level / visual approach mode).'],
 ];

@@ -57,6 +57,8 @@ export class Rules {
       return req;
     }
     req = RADAR_NM;
+    // 5-8-3: successive/simultaneous departures on courses diverging ≥ 15° need 1 NM (SFO releases 1L/1R together)
+    if (a.kind === 'DEP' && b.kind === 'DEP' && Math.hypot(a.x, a.y) < 12 && Math.hypot(b.x, b.y) < 12 && Math.abs(angDiff(a.hdg, b.hdg)) >= 15) req = 1;
     // wake "directly behind" (5-5-4 g1): within 2,500 ft of the leader's track, behind, less than 1,000 ft below
     for (const [lead, trail] of [[a, b], [b, a]]) {
       const { cross, along } = trackOffsets(lead, lead.hdg, trail);
@@ -128,9 +130,12 @@ export class Rules {
           const tDepSect = Math.sqrt(2 * distToSect / (dep.perf.accelGround * 1.6878)) ; // s to reach the intersection from a standing start (kt/s → ft/s²)
           if (tArrThr < tDepSect + 5 && !this.protectionOff) this.raise(shift, 'CROSSING_CONFLICT', dep, o, { how: `${o.callsign} crosses the ${o.runway} threshold in ${Math.round(tArrThr)} s, departure needs ${Math.round(tDepSect)} s to the intersection`, para: '3-10-4' });
         }
-        // wake time intervals across intersecting runways (3-9-8 wake)
-        const last = this.lastRoll[o.id] ?? this.lastThreshold[o.id];
-        if (last && (o.mode === MODES.CLIMB || o.mode === MODES.SID || o.mode === MODES.ROLLOUT || o.mode === MODES.LANDED || o.mode === MODES.TAKEOFF)) {
+        // wake time intervals across intersecting runways (3-9-8 wake): only when the flight paths cross — a preceding departure's
+        // airborne path crosses ours; a landing aircraft's path only if it touched down beyond the intersection (FIG 3-9-13). SFO 28 arrivals
+        // touch down ~1,500–3,000 ft in, short of the 1L/1R intersections, so they do not trigger it (D19).
+        const pathsCross = o.kind === 'DEP' ? this.lastRoll[o.id] != null : (o.touchdownFromThrFt != null && o.touchdownFromThrFt > sect.fromThrFt[o.runway]);
+        const last = o.kind === 'DEP' ? this.lastRoll[o.id] : this.lastThreshold[o.id];
+        if (pathsCross && last != null && (o.mode === MODES.CLIMB || o.mode === MODES.SID || o.mode === MODES.ROLLOUT || o.mode === MODES.LANDED || o.mode === MODES.TAKEOFF)) {
           const need = wakeDepartureInterval(o.cwt, dep.cwt);
           if (need && shift.t - last < need) this.raise(shift, 'WAKE', dep, o, { how: `departure ${Math.round(shift.t - last)} s behind ${o.callsign} (${o.cwt}) across the intersection, ${need} s required`, para: '3-9-8' });
         }

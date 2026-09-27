@@ -33,7 +33,7 @@ export function buildProcedures(procJson, proj) {
       // keep the part inside the scope (plus the first fix outside it as the entry point)
       const inside = legs.map((l) => Math.hypot(l.x, l.y) <= SCOPE_NM);
       const firstIn = inside.indexOf(true); if (firstIn < 0) continue;
-      const route = legs.slice(Math.max(0, firstIn - 1)).filter((l) => l.fix !== 'KSFO' && l.fix !== 'SFO');
+      const route = legs.slice(firstIn).filter((l) => l.fix !== 'KSFO' && l.fix !== 'SFO');
       if (route.length < 2) continue;
       const entry = route[0];
       const entryAlt = legAltitude(entry, null) ?? Math.min(15000, Math.round(Math.hypot(entry.x, entry.y) * 300 / 1000) * 1000);

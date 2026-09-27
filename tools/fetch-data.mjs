@@ -35,7 +35,7 @@ export const SOURCES = [
     licence: 'Iowa Environmental Mesonet ASOS archive (redistributed NWS/FAA METAR observations) — US Government observations, public domain; IEM asks for attribution and rate limiting.', use: 'historical KSFO METARs for runway configuration statistics and shift weather (T6)' })),
   ...Array.from({ length: 12 }, (_, i) => i + 1).map((m) => ({ id: `bts-2025-${m}`, url: BTS(m), out: `bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_${m}.zip`,
     licence: 'US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.', use: 'real hourly SFO arrival/departure counts and carrier mix (traffic shape)' })),
-  ...['chap0_section_0', 'chap2_section_1', 'chap3_section_9', 'chap3_section_10', 'chap5_section_5', 'chap7_section_2'].map((p) => ({ id: `7110-${p}`, url: ATC(p), out: `faa-7110/${p}.html`,
+  ...['chap0_section_0', 'chap2_section_1', 'chap3_section_9', 'chap3_section_10', 'chap5_section_5', 'chap5_section_8', 'chap7_section_2'].map((p) => ({ id: `7110-${p}`, url: ATC(p), out: `faa-7110/${p}.html`,
     licence: 'FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.', use: 'separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md' })),
   { id: '7360-1K', url: 'https://www.faa.gov/documentLibrary/media/Order/FAA_Order_JO_7360.1K_Aircraft_Type_Designators.pdf', out: 'aircraft/FAA_Order_JO_7360.1K_Aircraft_Type_Designators.pdf',
     licence: 'FAA Order JO 7360.1K Aircraft Type Designators — US Government work, public domain.', use: 'per-type CWT wake category, SRS category, weight class' },

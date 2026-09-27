@@ -219,6 +219,15 @@
       "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
       "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
     },
+    "faa-7110/chap5_section_8.html": {
+      "id": "7110-chap5_section_8",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap5_section_8.html",
+      "sha256": "3061f49440be3d24bc6b86f23dc00ee050ba55c3f4c25cd49d281d476192d93f",
+      "bytes": 60457,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
     "faa-7110/chap7_section_2.html": {
       "id": "7110-chap7_section_2",
       "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap7_section_2.html",

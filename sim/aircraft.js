@@ -53,9 +53,9 @@ export class Aircraft {
   }
   stepTakeoff(dt, env) {
     const rw = env.airport.ends[this.runway];
-    if (!this.onRunway) this.enterRunway(rw, env);
     const p = this.perf;
     if (this.liftoffAt == null) {
+      if (!this.onRunway) this.enterRunway(rw, env);
       this.ias = Math.min(p.vR + 5, this.ias + p.accelGround * dt);
       const v = this.ias / 3600; // NM/s ground speed (ignore wind on the roll)
       const step = advance({ x: this.x, y: this.y }, rw.hdg, v * dt); this.x = step.x; this.y = step.y; this.rolledFt += v * dt * NM_FT; this.alongRunwayFt = this.rolledFt;
@@ -118,7 +118,7 @@ export class Aircraft {
     if (this.mode === MODES.STAR && !this.tgt.altAssigned) tgtAlt = this.routeAltitude();
     if (this.mode === MODES.FINAL) {
       const rwE = airport.ends[this.runway];
-      if ((this.finalDistNm ?? 1) <= 0) { tgtAlt = rwE.elevFt; vsCap = -Math.max(300, Math.min(700, (this.alt - rwE.elevFt) * 8)); } // over the runway: flare and touch down ~1,000–1,500 ft in
+      if ((this.finalDistNm ?? 1) <= 0) { tgtAlt = rwE.elevFt; vsCap = -650; } // over the runway: flare and touch down ~1,000–1,500 ft in
       else { const gsAlt = this.glideslopeAlt(env); if (this.alt <= gsAlt + 30) { tgtAlt = gsAlt; vsCap = -this.gs * Math.tan(rad(rwE.gsDeg)) * 101.27; } else tgtAlt = Math.min(this.tgt.alt, gsAlt); }
     }
     if (this.mode === MODES.GOAROUND) tgtAlt = Math.max(GA_ALT_FT, this.tgt.alt);
@@ -199,7 +199,8 @@ export class Aircraft {
     if (this.thresholdCrossedAt != null && this.alt <= rw.elevFt + 3) {
       this.alt = rw.elevFt; this.onGround = true; this.mode = MODES.ROLLOUT; this.modeTimer = 0; this.touchdownAt = env.t; this.vs = 0; this.hdg = rw.hdg;
       const { cross } = trackOffsets(rw.thr, rw.hdg, this); const c = advance(this, rw.hdg - 90 * Math.sign(cross) , Math.abs(cross)); this.x = c.x; this.y = c.y; // snap to centreline
-      env.events.push({ t: env.t, type: 'TOUCHDOWN', ac: this.id, runway: this.runway, fromThrFt: Math.round(trackOffsets(rw.thr, rw.hdg, this).along * NM_FT) });
+      this.touchdownFromThrFt = Math.round(trackOffsets(rw.thr, rw.hdg, this).along * NM_FT);
+      env.events.push({ t: env.t, type: 'TOUCHDOWN', ac: this.id, runway: this.runway, fromThrFt: this.touchdownFromThrFt });
     }
   }
   goAround(env, reason, commanded = false) {

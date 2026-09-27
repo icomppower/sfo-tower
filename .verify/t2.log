@@ -1,0 +1,16 @@
+  neg caught  threshold shifted 2 m north is caught
+  neg caught  threshold shifted 1.5 m east is caught
+  neg caught  heading rotated 1° is caught
+  neg caught  a runway end swapped with its neighbour is caught
+  ok   8 runway ends, 4 runways in the model
+  ok   every landing threshold within 1 m of NASR — 0.000 m max
+  ok   every runway heading within 0.5° of NASR true alignment — 0.000° max
+  ok   NASR true alignment agrees with the great-circle bearing between the runway ends (≤ 0.5°) — 0.300° max
+  ok   projection round trip < 0.05 m — 0.0000 m
+  ok   OurAirports runway ends within 15 m and 1° of the NASR model (cross-check) — 1.9 m, 0.0°
+  ok   CIFP landing thresholds within 3 m of the NASR displaced thresholds (cross-check) — 0.16 m
+  ok   CIFP magnetic bearings + NASR variation = NASR true alignment (≤ 0.5°)
+  ok   28L/28R × 1L/1R intersections exist, 4,000–6,000 ft from the 28 thresholds — 5338/5338/4590/4590
+  ok   all four parallel pairs are < 2,500 ft apart (one runway for wake, 5-5-4) — [["1L","1R",750],["19R","19L",745],["10L","10R",749],["28R","28L",750]]
+NEGATIVE 4/4
+PASS T2 Airport geometry — thr 0.000 m, hdg 0.00°, OurAirports 1.9 m, CIFP 0.16 m (10 checks, 0 failed)
