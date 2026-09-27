@@ -41,6 +41,12 @@ export const SOURCES = [
     licence: 'FAA Order JO 7360.1K Aircraft Type Designators — US Government work, public domain.', use: 'per-type CWT wake category, SRS category, weight class' },
   { id: 'sfo-capacity-profile', url: 'https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/profiles/SFO-Airport-Capacity-Profile-2019.pdf', out: 'capacity/SFO-Airport-Capacity-Profile-2019.pdf',
     licence: 'FAA Airport Capacity Profile: San Francisco International (2019) — US Government work, public domain.', use: 'called arrival/departure rates by runway configuration and weather (T6 throughput ranges)' },
+  { id: 'faa-ifh', url: 'https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/FAA-H-8083-15B.pdf', out: 'refs/FAA-H-8083-15B.pdf',
+    licence: 'FAA Instrument Flying Handbook FAA-H-8083-15B — US Government work, public domain.', use: 'standard rate turn = 3° per second (T3 turn-rate citation)' },
+  { id: 'faa-aim-4-4', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap4_section_4.html', out: 'faa-aim/chap4_section_4.html',
+    licence: 'FAA Aeronautical Information Manual, Chapter 4 Section 4 (HTML) — US Government work, public domain.', use: 'AIM 4-4-12 speed adjustments: 250 kt below 10,000 ft (14 CFR 91.117), 200 kt within Class B surface area speed context (T3)' },
+  { id: 'ecfr-91-117', url: 'https://www.ecfr.gov/api/versioner/v1/full/2026-09-01/title-14.xml?part=91&section=91.117', out: 'refs/14CFR-91.117.xml',
+    licence: 'eCFR, 14 CFR 91.117 Aircraft speed (point-in-time 2026-09-01) — US Government work, public domain.', use: '250 kt below 10,000 ft (T3)' },
   { id: 'faa-aircraft-char', url: 'https://www.faa.gov/airports/engineering/aircraft_char_database/aircraft_data', out: 'aircraft/FAA-Aircraft-Char-Database.xlsx',
     licence: 'FAA Aircraft Characteristics Database (Office of Airports) — US Government work, public domain.', use: 'approach speed, approach category, wingspan/length per type (T3)' },
 ];

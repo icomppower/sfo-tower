@@ -2,10 +2,10 @@
 
 | Gate | Status | Last run | Notes |
 |------|--------|----------|-------|
-| T0 Data | PASS | 2026-09-27 | Data — 29 raw files checksummed, 26290 METARs, 15 approaches, 44 aircraft types (27 checks, 0 failed) (negatives 4/4) |
+| T0 Data | PASS | 2026-09-27 | Data — 32 raw files checksummed, 26290 METARs, 15 approaches, 44 aircraft types (27 checks, 0 failed) (negatives 4/4) |
 | T1 Sim split | PASS | 2026-09-27 | Sim split — hash 9115c045 ×2, 284 events, classic byte-identical + playable (11 checks, 0 failed) (negatives 4/4) |
 | T2 Airport geometry | PASS | 2026-09-27 | Airport geometry — thr 0.000 m, hdg 0.00°, OurAirports 1.9 m, CIFP 0.16 m (10 checks, 0 failed) (negatives 4/4) |
-| T3 Flight model | — | | |
+| T3 Flight model | PASS | 2026-09-27 | Flight model — 10 types × approach speed / glideslope / TCH / turns / climb (60 checks, 0 failed) (negatives 5/5) |
 | T4 Separation rules | — | | |
 | T5 SFO runway ops | — | | |
 | T6 Weather | — | | |
@@ -15,4 +15,4 @@
 
 ## Current
 
-T0–T1 green (2026-09-26). `sim/` = rng, geo, airport, procedures, perf, aircraft, commands, weather, traffic, rules, scoring, shift, bot. Next: T2 geometry gate, then T3–T7 with the bot as the oracle.
+T0–T3 green (2026-09-26). Bot controller (sim/bot.js) is the T6/T7 oracle and still loses radar separation in its holding pattern; reworking it to holding stacks. Next: T4 separation scenario library, T5 crossing-runway ops.

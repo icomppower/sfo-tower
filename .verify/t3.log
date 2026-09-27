@@ -1,0 +1,67 @@
+  neg caught  approach speed 20 kt fast is caught
+  neg caught  glideslope flown 1° steep is caught
+  neg caught  a 35° bank limit is caught by the bank-limited turn check
+  neg caught  a 15° bank limit (≈2°/s) is caught by the standard-rate check
+  neg caught  a climb rate 30 % off the table is caught
+  ok   B738: IAS at 3 NM = ACD approach speed 144 kt (±2) — 144.0 kt
+  ok   B738: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   B738: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 78 ft AGL, td 2097 ft
+  ok   B738: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   B738: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   B738: climb 2500 fpm and descent cap 1800 fpm within 5 % — 2500 / 1800 fpm
+  ok   A320: IAS at 3 NM = ACD approach speed 136 kt (±2) — 136.0 kt
+  ok   A320: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   A320: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 80 ft AGL, td 2202 ft
+  ok   A320: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   A320: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   A320: climb 2500 fpm and descent cap 1800 fpm within 5 % — 2500 / 1800 fpm
+  ok   B77W: IAS at 3 NM = ACD approach speed 149 kt (±2) — 149.0 kt
+  ok   B77W: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   B77W: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 78 ft AGL, td 2183 ft
+  ok   B77W: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   B77W: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   B77W: climb 2000 fpm and descent cap 1800 fpm within 5 % — 2000 / 1800 fpm
+  ok   A388: IAS at 3 NM = ACD approach speed 138 kt (±2) — 138.0 kt
+  ok   A388: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   A388: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 76 ft AGL, td 2066 ft
+  ok   A388: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   A388: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   A388: climb 2000 fpm and descent cap 1800 fpm within 5 % — 2000 / 1800 fpm
+  ok   E75L: IAS at 3 NM = ACD approach speed 126 kt (±2) — 126.0 kt
+  ok   E75L: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   E75L: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 76 ft AGL, td 1914 ft
+  ok   E75L: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   E75L: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   E75L: climb 2500 fpm and descent cap 1800 fpm within 5 % — 2500 / 1800 fpm
+  ok   CRJ9: IAS at 3 NM = ACD approach speed 141 kt (±2) — 141.0 kt
+  ok   CRJ9: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   CRJ9: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 78 ft AGL, td 2085 ft
+  ok   CRJ9: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   CRJ9: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   CRJ9: climb 2500 fpm and descent cap 1800 fpm within 5 % — 2500 / 1800 fpm
+  ok   DH8D: IAS at 3 NM = ACD approach speed 125 kt (±2) — 125.0 kt
+  ok   DH8D: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   DH8D: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 84 ft AGL, td 1966 ft
+  ok   DH8D: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   DH8D: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   DH8D: climb 1500 fpm and descent cap 1800 fpm within 5 % — 1500 / 1800 fpm
+  ok   B752: IAS at 3 NM = ACD approach speed 137 kt (±2) — 137.0 kt
+  ok   B752: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 15 / 20 ft
+  ok   B752: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 84 ft AGL, td 2135 ft
+  ok   B752: standard rate turn 3°/s at 140 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   B752: bank-limited rate at 250 kt within 5 % of 1091·tan(25°)/TAS = 1.75°/s — 1.75°/s
+  ok   B752: climb 2500 fpm and descent cap 1800 fpm within 5 % — 2500 / 1800 fpm
+  ok   C172: IAS at 3 NM = ACD approach speed 62 kt (±2) — 62.0 kt
+  ok   C172: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 13 / 19 ft
+  ok   C172: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 85 ft AGL, td 992 ft
+  ok   C172: standard rate turn 3°/s at 100 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   C172: climb 700 fpm and descent cap 1000 fpm within 5 % — 700 / 1000 fpm
+  ok   PC12: IAS at 3 NM = ACD approach speed 85 kt (±2) — 85.0 kt
+  ok   PC12: on the 3° glideslope at 10 NM and 5 NM (±60 ft) — 21 / 20 ft
+  ok   PC12: crosses the threshold near TCH 68 ft (±40) and touches down 500–2,500 ft in — 81 ft AGL, td 1433 ft
+  ok   PC12: standard rate turn 3°/s at 100 kt (±0.1; the 25° bank limit takes over above ~170 kt TAS) — 3.04°/s
+  ok   PC12: climb 700 fpm and descent cap 1000 fpm within 5 % — 700 / 1000 fpm
+  ok   departure never exceeds 250 kt IAS below 10,000 ft (14 CFR 91.117 / AIM 4-4-12) — 250 kt
+  ok   B738 liftoff after a 3,000–8,000 ft roll at Vr — 5003 ft
+NEGATIVE 5/5
+PASS T3 Flight model — 10 types × approach speed / glideslope / TCH / turns / climb (60 checks, 0 failed)

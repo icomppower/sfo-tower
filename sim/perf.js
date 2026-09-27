@@ -12,7 +12,7 @@ export function buildPerf(acJson) {
       vRef: t.approachSpeedKt, vR: Math.round(t.approachSpeedKt * (jet ? 1.05 : 1.1)),
       vMax: small ? Math.min(160, t.approachSpeedKt * 2) : 250, // FAR 91.117: 250 kt below 10,000 ft
       vClean: small ? Math.min(140, t.approachSpeedKt * 1.8) : jet ? 210 : 180,
-      climbFpm: small ? 700 : jet ? (heavy ? 2000 : 2500) : 1500, descentFpm: small ? 800 : 1800,
+      climbFpm: small ? 700 : jet ? (heavy ? 2000 : 2500) : 1500, descentFpm: small ? 1000 : 1800,
       accelKts: small ? 1.5 : jet ? 2.2 : 1.8, decelKts: small ? 2 : 1.2, // air; ground roll uses accelGround
       accelGround: small ? 3.5 : heavy ? 3.3 : 4.0, brakeKts: small ? 3 : 2.6,
       rolloutFt: small ? 2500 : heavy ? 6500 : 5200, // typical runway occupancy footprint to a high-speed exit

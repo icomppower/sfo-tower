@@ -25,6 +25,8 @@ export function srsDistanceFt(leaderSrs, followerSrs) {
   return 3000;
 }
 export const RADAR_NM = 3, RADAR_FINAL_NM = 2.5, VERTICAL_FT = 1000, COLLISION_NM = 0.05, COLLISION_FT = 200;
+// Mode C is displayed to 100 ft and ±200 ft is 'valid' (5-2-17); two aircraft assigned altitudes 1,000 ft apart are separated even while one is ±50 ft in its level-off (D21).
+export const VERTICAL_TOL_FT = 950;
 
 export class Rules {
   constructor(airport, opts = {}) { this.airport = airport; this.active = new Map(); this.lastRoll = {}; this.lastThreshold = {}; this.protectionOff = !!opts.protectionOff; this.radarOff = !!opts.radarOff; }
@@ -78,7 +80,7 @@ export class Rules {
       if (this.radarOff) continue;
       const req = this.requiredNm(a, b, weather);
       const kind = req > RADAR_NM ? 'WAKE' : 'SEP_LOSS';
-      if (req > 0 && dv < VERTICAL_FT && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
+      if (req > 0 && dv < VERTICAL_TOL_FT && d < req - 0.02) this.raise(shift, kind, a, b, { nm: +d.toFixed(2), reqNm: req, ft: Math.round(dv) });
       else { this.clear(a, b, 'SEP_LOSS'); this.clear(a, b, 'WAKE'); }
     }
     // ---- runway events raised this step ----
@@ -90,7 +92,7 @@ export class Rules {
     // ---- continuous: two aircraft rolling toward the same intersection (3-9-8 / 3-10-4) ----
     if (!this.protectionOff) for (let i = 0; i < acs.length; i++) for (let j = i + 1; j < acs.length; j++) {
       const a = acs[i], b = acs[j];
-      if (!a.onRunway || !b.onRunway || a.onRunway === b.onRunway) continue;
+      if (!a.onRunway || !b.onRunway || a.onRunway === b.onRunway || a.clearedRunwayAt != null || b.clearedRunwayAt != null) continue;
       const sect = this.airport.intersecting(a.runway, b.runway); if (!sect) continue;
       const aBefore = a.alongRunwayFt < sect.fromThrFt[a.runway], bBefore = b.alongRunwayFt < sect.fromThrFt[b.runway];
       const aMoving = a.mode === MODES.TAKEOFF || a.mode === MODES.ROLLOUT, bMoving = b.mode === MODES.TAKEOFF || b.mode === MODES.ROLLOUT;
@@ -118,7 +120,7 @@ export class Rules {
       // intersecting runway (3-9-8): preceding arrival must be clear / past the intersection / holding short; preceding departure past the intersection or airborne turning
       const sect = ap.intersecting(dep.runway, o.runway);
       if (sect && !this.protectionOff) {
-        if (o.onRunway && o.onRunway !== rw.physical) {
+        if (o.onRunway && o.onRunway !== rw.physical && o.clearedRunwayAt == null) {
           const past = o.alongRunwayFt >= sect.fromThrFt[o.runway];
           const holdingShort = o.mode === MODES.ROLLOUT && o.ias < 5 && !past;
           if (!past && !holdingShort && o.mode !== MODES.LUAW && o.mode !== MODES.QUEUE) this.raise(shift, 'CROSSING_CONFLICT', dep, o, { how: `${o.callsign} on runway ${o.runway} not yet past the intersection`, para: '3-9-8' });
@@ -161,7 +163,7 @@ export class Rules {
         if (!okSep) this.raise(shift, 'RUNWAY_INCURSION', arr, o, { how: `over the threshold with ${o.callsign} on runway ${o.runway}`, para: '3-10-3' });
       }
       const sect = ap.intersecting(arr.runway, o.runway);
-      if (sect && !this.protectionOff && o.onRunway && o.onRunway !== rw.physical) { // 3-10-4
+      if (sect && !this.protectionOff && o.onRunway && o.onRunway !== rw.physical && o.clearedRunwayAt == null) { // 3-10-4
         const past = o.alongRunwayFt >= sect.fromThrFt[o.runway];
         const airborneTurning = o.liftoffAt != null && Math.abs(angDiff(o.hdg, ap.ends[o.runway].hdg)) > 15;
         const holding = (o.mode === MODES.LUAW || o.mode === MODES.QUEUE) || (o.mode === MODES.ROLLOUT && o.ias < 5 && !past);

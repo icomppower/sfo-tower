@@ -119,13 +119,18 @@ export class Aircraft {
     if (this.mode === MODES.FINAL) {
       const rwE = airport.ends[this.runway];
       if ((this.finalDistNm ?? 1) <= 0) { tgtAlt = rwE.elevFt; vsCap = -650; } // over the runway: flare and touch down ~1,000–1,500 ft in
-      else { const gsAlt = this.glideslopeAlt(env); if (this.alt <= gsAlt + 30) { tgtAlt = gsAlt; vsCap = -this.gs * Math.tan(rad(rwE.gsDeg)) * 101.27; } else tgtAlt = Math.min(this.tgt.alt, gsAlt); }
+      else {
+        const gsAlt = this.glideslopeAlt(env), gsRate = -this.gs * Math.tan(rad(rwE.gsDeg)) * 101.27;
+        if (this.alt <= gsAlt + 30) { tgtAlt = gsAlt; vsCap = gsRate; }
+        else { tgtAlt = gsAlt; vsCap = Math.max(-p.descentFpm, gsRate - Math.min(900, (this.alt - gsAlt) * 3)); } // above the slope: descend faster than the slope to converge
+      }
     }
     if (this.mode === MODES.GOAROUND) tgtAlt = Math.max(GA_ALT_FT, this.tgt.alt);
     const dAlt = tgtAlt - this.alt;
     let vs = dAlt > 0 ? Math.min(p.climbFpm, dAlt * 6) : Math.max(-p.descentFpm, dAlt * 6);
-    if (vsCap != null && this.mode === MODES.FINAL && dAlt <= 30) vs = (this.finalDistNm ?? 1) <= 0 ? vsCap : Math.max(vsCap - 100, Math.min(vs, vsCap + 50));
+    if (vsCap != null && this.mode === MODES.FINAL) vs = (this.finalDistNm ?? 1) <= 0 ? vsCap : dAlt < -30 ? vsCap : dAlt > 30 ? 0 : Math.max(vsCap - 100, Math.min(vs, vsCap + 50)); // below the slope: level until it comes down
     if (Math.abs(dAlt) < 1) vs = 0;
+    if (Math.abs(dAlt) < 3 && this.mode !== MODES.FINAL) { this.alt = tgtAlt; vs = 0; } // level exactly at the assigned altitude
     this.vs = vs; this.alt += vs * dt / 60;
     if (this.mode === MODES.FINAL && this.alt < tgtAlt && vs < 0 && this.alt < airport.ends[this.runway].elevFt + 60) this.alt = Math.max(this.alt, airport.ends[this.runway].elevFt);
     // ---- position (air velocity + wind) ----
@@ -161,7 +166,7 @@ export class Aircraft {
   routeAltitude() {
     const leg = this.route[this.routeIdx]; if (!leg) return this.tgt.alt;
     const a = legAltitude(leg, null); if (a == null) return this.tgt.alt;
-    if (leg.altDesc === '+' ) return Math.min(this.alt, Math.max(a, this.tgt.alt === this.alt ? a : this.tgt.alt)); // at-or-above: descend no lower than a
+    if (leg.altDesc === '+') return Math.max(a, Math.min(this.alt, this.tgt.alt)); // at-or-above: hold, never below a, never climb
     return a;
   }
   routeSpeed() { const leg = this.route[this.routeIdx]; const s = leg?.speed; const base = this.kind === 'ARR' ? Math.min(this.perf.vMax, 250) : this.perf.vMax; return s ? Math.min(s, base) : base; }

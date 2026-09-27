@@ -3,7 +3,7 @@
   neg caught  a truncated raw file is caught
   neg caught  a source without a licence note is caught
   ok   checksums verify (fetch-data --check)
-  ok   every manifest source has a checksum record — 29/29
+  ok   every manifest source has a checksum record — 32/32
   ok   every record carries a licence note and a use
   ok   source group cached: nasr
   ok   source group cached: cifp
@@ -30,4 +30,4 @@
   ok   capacity profile: 6 configuration rate ranges incl. VISUAL side-by and INSTRUMENT in-trail
   ok   RULES.md quotes 3-9-6, 3-9-8, 3-10-3, 3-10-4, 5-5-4 from 7110.65BB
 NEGATIVE 4/4
-PASS T0 Data — 29 raw files checksummed, 26290 METARs, 15 approaches, 44 aircraft types (27 checks, 0 failed)
+PASS T0 Data — 32 raw files checksummed, 26290 METARs, 15 approaches, 44 aircraft types (27 checks, 0 failed)
