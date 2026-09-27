@@ -12,16 +12,17 @@ export class Gate {
   /** A real check: `ok` must be truthy. */
   check(name, ok, detail = '') { this.checks++; const line = `${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? ' — ' + detail : ''}`; console.log('  ' + line); if (!ok) this.fails.push(line); return !!ok; }
   /** A negative fixture: `fn` must return false / throw (the mutated input must be caught). */
+  /** A negative fixture: `fn` must return false (the mutated input was caught). An exception is NOT a catch — it means the fixture never ran the check. */
   negative(name, fn) {
     let caught = false, err = '';
-    try { caught = fn() === false; } catch (e) { caught = true; err = e.message; }
-    this.neg.push(caught); console.log(`  neg ${caught ? 'caught ' : 'MISSED '} ${name}${err ? ' (' + err.slice(0, 80) + ')' : ''}`);
+    try { caught = fn() === false; } catch (e) { caught = false; err = 'threw: ' + e.message; }
+    this.neg.push(caught); console.log(`  neg ${caught ? 'caught ' : 'MISSED '} ${name}${err ? ' (' + err.slice(0, 100) + ')' : ''}`);
     return caught;
   }
   async negativeAsync(name, fn) {
     let caught = false, err = '';
-    try { caught = (await fn()) === false; } catch (e) { caught = true; err = e.message; }
-    this.neg.push(caught); console.log(`  neg ${caught ? 'caught ' : 'MISSED '} ${name}${err ? ' (' + err.slice(0, 80) + ')' : ''}`);
+    try { caught = (await fn()) === false; } catch (e) { caught = false; err = 'threw: ' + e.message; }
+    this.neg.push(caught); console.log(`  neg ${caught ? 'caught ' : 'MISSED '} ${name}${err ? ' (' + err.slice(0, 100) + ')' : ''}`);
     return caught;
   }
   finish(summary = '') {

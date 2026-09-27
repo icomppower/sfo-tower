@@ -1,1 +1,63 @@
-body{margin:0;background:#0b1020;color:#dfe6f3;font-family:system-ui}
+:root { --bg: #071019; --panel: #0e1a26; --panel2: #132434; --ink: #dfe8f2; --dim: #8fa3b8; --accent: #3fc3ff; --ok: #5be08a; --warn: #ffb648; --bad: #ff5c6c; --grid: #1a2c3e; --btn: #1c3247; --btnHi: #27455f; --radius: 10px; --gap: 8px; --hud: 44px; --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 14px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif; overflow: hidden; touch-action: none; }
+button { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid #2b4a66; border-radius: var(--radius); padding: 0 12px; min-height: 44px; min-width: 44px; cursor: pointer; }
+button:hover { background: var(--btnHi); } button:disabled { opacity: .4; cursor: default; } button.primary { background: #1f6fa8; border-color: #3fc3ff; } button.active { background: #2b5f86; border-color: var(--accent); }
+select, input { font: inherit; color: var(--ink); background: var(--panel2); border: 1px solid #2b4a66; border-radius: 8px; min-height: 40px; padding: 0 8px; }
+#app { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto auto; }
+/* ---- HUD ---- */
+#hud { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-height: var(--hud); padding: calc(var(--safe-t) + 4px) 8px 4px 8px; background: var(--panel); border-bottom: 1px solid var(--grid); white-space: nowrap; }
+#hud .stat, #hud button { flex: 0 0 auto; }
+#hud .stat { padding: 4px 8px; border-radius: 8px; background: var(--panel2); font-variant-numeric: tabular-nums; }
+#hud .stat b { color: var(--accent); } #hud .stat.bad b { color: var(--bad); } #hud .stat.ok b { color: var(--ok); }
+#hud .spacer { flex: 1; } #hud button { min-height: 34px; padding: 0 10px; }
+#atis { color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; flex: 1 1 0 !important; min-width: 0; }
+/* ---- main area ---- */
+#main { position: relative; display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr; min-height: 0; }
+#main.both { grid-template-columns: 1fr minmax(260px, 34%); }
+canvas.view { width: 100%; height: 100%; display: block; background: #050b12; }
+#scopeWrap, #surfaceWrap { position: relative; min-width: 0; min-height: 0; border-right: 1px solid var(--grid); }
+#surfaceWrap { border-right: 0; }
+.viewLabel { position: absolute; left: 8px; top: 6px; font-size: 12px; color: var(--dim); pointer-events: none; }
+#rangeBtns { position: absolute; right: 8px; top: 6px; display: flex; gap: 4px; }
+#rangeBtns button { min-height: 32px; min-width: 40px; padding: 0 8px; font-size: 12px; }
+/* ---- ticker ---- */
+#ticker { height: 26px; padding: 0 8px; font-size: 12px; color: var(--dim); background: var(--panel); border-top: 1px solid var(--grid); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 26px; }
+#ticker .rb { color: var(--ink); } #ticker .alert { color: var(--bad); font-weight: 600; }
+/* ---- command bar ---- */
+#cmdbar { background: var(--panel); border-top: 1px solid var(--grid); padding: 6px 8px calc(6px + var(--safe-b)) 8px; display: flex; flex-direction: column; gap: 6px; }
+#cmdbar .sel { display: flex; align-items: center; gap: 8px; min-height: 28px; font-variant-numeric: tabular-nums; }
+#cmdbar .sel b { color: var(--accent); font-size: 16px; } #cmdbar .sel .dim { color: var(--dim); }
+#cmdRow { display: flex; flex-wrap: wrap; gap: 6px; }
+#cmdRow button { flex: 1 1 auto; min-width: 64px; padding: 0 8px; font-size: 13px; }
+#cmdRow button.wide { flex-basis: 100%; }
+#picker { display: none; flex-wrap: wrap; gap: 6px; align-items: center; }
+#picker.open { display: flex; }
+#picker button { min-width: 52px; padding: 0 10px; }
+#picker input { width: 88px; }
+/* ---- overlays ---- */
+.overlay { position: absolute; inset: 0; background: rgba(4, 10, 18, .88); display: flex; align-items: center; justify-content: center; padding: 16px; overflow: auto; z-index: 20; }
+.card { background: var(--panel); border: 1px solid #2b4a66; border-radius: 16px; padding: 14px; width: min(560px, 100%); max-height: 100%; overflow: auto; }
+.card h1 { margin: 0 0 4px; font-size: 22px; } .card h2 { margin: 12px 0 6px; font-size: 15px; color: var(--accent); } .card p { color: var(--dim); margin: 6px 0; }
+.card .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.card .row label { min-width: 72px; color: var(--dim); }
+.card .seg { display: flex; gap: 4px; flex-wrap: wrap; } .card .seg button { min-height: 40px; }
+.card .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.card a { color: var(--accent); }
+.hidden { display: none !important; }
+/* ---- phone portrait: stack scope over surface when both, shrink HUD ---- */
+@media (max-width: 600px) {
+  #main.both { grid-template-columns: 1fr; grid-template-rows: 1fr 38%; }
+  #scopeWrap { border-right: 0; border-bottom: 1px solid var(--grid); }
+  #hud .stat.opt { display: none; }
+  #atis { display: none; }
+  #hud .spacer { flex-basis: 100%; height: 0; }
+  #hud .stat { padding: 3px 6px; font-size: 13px; }
+  #cmdRow button { min-width: 58px; font-size: 12px; }
+}
+/* ---- phone landscape: HUD stays, command bar compact ---- */
+@media (max-height: 460px) {
+  :root { --hud: 36px; }
+  #cmdbar { padding-top: 4px; } #cmdRow button { min-height: 40px; }
+  #ticker { height: 22px; line-height: 22px; }
+}

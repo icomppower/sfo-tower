@@ -10,7 +10,7 @@
 | T5 SFO runway ops | PASS | 2026-09-27 | SFO runway ops — 18 crossing / occupancy scenarios + bot shift (20 checks, 0 failed) (negatives 3/3) |
 | T6 Weather | PASS | 2026-09-27 | Weather — VISUAL 73 ops/h (31 arr), INSTRUMENT 64 ops/h (24 arr) (25 checks, 0 failed) (negatives 3/3) |
 | T7 Bot shift | PASS | 2026-09-27 | Bot shift — easy ×9 clean, normal ×3 bounded, hard ×3 measurable losses (13 checks, 0 failed) (negatives 3/3) |
-| T8 UI | — | | |
+| T8 UI | PASS | 2026-09-27 | UI — 3 viewports × layout / reachability / real-click commands (27 checks, 0 failed) (negatives 4/4) |
 | T9 Look (advisory) | — | | |
 
 ## Current

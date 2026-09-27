@@ -44,4 +44,6 @@ if (process.argv[1].endsWith('derive-metar.mjs')) {
   const cats = {}; for (const r of recs) cats[r.cat] = (cats[r.cat] ?? 0) + 1;
   console.log(`${recs.length} obs ${files.join(', ')}`, cats);
   writeJSON('ksfo-metar.json', { generated: 'tools/derive-metar.mjs', station: 'KSFO', source: 'IEM ASOS archive (NWS METAR)', years: files.map((f) => +f.slice(5, 9)), records: recs });
+  // browser copy: same records without the raw METAR text and with short keys expanded on load (view/main.js)
+  writeJSON('ksfo-metar.min.json', { generated: 'tools/derive-metar.mjs', station: 'KSFO', source: 'IEM ASOS archive (NWS METAR)', years: files.map((f) => +f.slice(5, 9)), records: recs.map((r) => [r.t, r.wd, r.ws, r.gust, r.vis, r.ceil, r.wx.join(' '), r.temp, r.dew, r.altim, r.cat]) });
 }

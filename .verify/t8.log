@@ -1,0 +1,33 @@
+  neg caught  a command bar overlapping the radar canvas is caught
+  neg caught  controls pushed off-screen (giant HUD font) are caught
+  neg caught  command buttons covered by another layer are caught by the hit-test
+  neg caught  an overlay that blocks the picker is caught
+  ok   phone portrait: no page errors
+  ok   phone portrait: menu layout — start/lang/options inside, reachable, no overlaps, no scroll — 15 controls, outside -, unreachable -, overlaps -, scroll 390×844 in 390×844
+  ok   phone portrait: play layout — HUD, range, command buttons inside, reachable, no overlaps, cmd bar clear of canvases — 9 controls, outside -, unreachable -, overlaps -, scroll 390×844 in 390×844
+  ok   phone portrait: touch targets ≥ 40×32 px — -
+  ok   phone portrait: arrival commands present [heading altitude speed approach land goaround] — heading,altitude,speed,approach,land,goaround
+  ok   phone portrait: heading picker reachable and a real click changes the target heading (+10°) — 140.6779571026044→150 22 controls, outside -, unreachable -, overlaps -, scroll 390×844 in 390×844
+  ok   phone portrait: altitude 6k by click, approach clearance by click — alt 6000, {"cleared":true,"mode":"APPROACH"}, options ILS 28L|Visual 28L|ILS 28R|Visual 28R|Cancel
+  ok   phone portrait: departure commands [luaw takeoff holdshort] and line-up by click — luaw,takeoff,holdshort → LUAW
+  ok   phone portrait: HUD time-scale and pause buttons work — {"before":1,"ts":4,"paused":true}
+  ok   phone landscape: no page errors
+  ok   phone landscape: menu layout — start/lang/options inside, reachable, no overlaps, no scroll — 15 controls, outside -, unreachable -, overlaps -, scroll 844×390 in 844×390
+  ok   phone landscape: play layout — HUD, range, command buttons inside, reachable, no overlaps, cmd bar clear of canvases — 9 controls, outside -, unreachable -, overlaps -, scroll 844×390 in 844×390
+  ok   phone landscape: touch targets ≥ 40×32 px — -
+  ok   phone landscape: arrival commands present [heading altitude speed approach land goaround] — heading,altitude,speed,approach,land,goaround
+  ok   phone landscape: heading picker reachable and a real click changes the target heading (+10°) — 140.6779571026044→150 22 controls, outside -, unreachable -, overlaps -, scroll 844×390 in 844×390
+  ok   phone landscape: altitude 6k by click, approach clearance by click — alt 6000, {"cleared":true,"mode":"APPROACH"}, options ILS 28L|Visual 28L|ILS 28R|Visual 28R|Cancel
+  ok   phone landscape: departure commands [luaw takeoff holdshort] and line-up by click — luaw,takeoff,holdshort → LUAW
+  ok   phone landscape: HUD time-scale and pause buttons work — {"before":1,"ts":4,"paused":true}
+  ok   desktop: no page errors
+  ok   desktop: menu layout — start/lang/options inside, reachable, no overlaps, no scroll — 15 controls, outside -, unreachable -, overlaps -, scroll 1440×900 in 1440×900
+  ok   desktop: play layout — HUD, range, command buttons inside, reachable, no overlaps, cmd bar clear of canvases — 9 controls, outside -, unreachable -, overlaps -, scroll 1440×900 in 1440×900
+  ok   desktop: touch targets ≥ 40×32 px — -
+  ok   desktop: arrival commands present [heading altitude speed approach land goaround] — heading,altitude,speed,approach,land,goaround
+  ok   desktop: heading picker reachable and a real click changes the target heading (+10°) — 140.6779571026044→150 22 controls, outside -, unreachable -, overlaps -, scroll 1440×900 in 1440×900
+  ok   desktop: altitude 6k by click, approach clearance by click — alt 6000, {"cleared":true,"mode":"APPROACH"}, options ILS 28L|Visual 28L|ILS 28R|Visual 28R|Cancel
+  ok   desktop: departure commands [luaw takeoff holdshort] and line-up by click — luaw,takeoff,holdshort → LUAW
+  ok   desktop: HUD time-scale and pause buttons work — {"before":1,"ts":4,"paused":true}
+NEGATIVE 4/4
+PASS T8 UI — 3 viewports × layout / reachability / real-click commands (27 checks, 0 failed)
