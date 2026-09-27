@@ -1,0 +1,259 @@
+{
+  "note": "SHA-256 of every raw file in data/raw/ (gitignored). Regenerate with node tools/fetch-data.mjs; verify with --check.",
+  "nasrCycle": "03_Sep_2026",
+  "cifpCycle": "260903",
+  "files": {
+    "nasr/03_Sep_2026_APT_CSV.zip": {
+      "id": "nasr-apt",
+      "url": "https://nfdc.faa.gov/webContent/28DaySub/extra/03_Sep_2026_APT_CSV.zip",
+      "sha256": "d5e4c999d4c96ab4d66d8ce9a387de8ea59b5226a6144ea1ba58758ff29bbbd9",
+      "bytes": 8043752,
+      "fetched": "2026-09-27",
+      "licence": "FAA NASR (National Airspace System Resources) 28-day subscription — US Government work, public domain.",
+      "use": "runway ends, thresholds, elevations, true alignment (T2 source of truth)"
+    },
+    "cifp/CIFP_260903.zip": {
+      "id": "cifp",
+      "url": "https://aeronav.faa.gov/Upload_313-d/cifp/CIFP_260903.zip",
+      "sha256": "ae016b916fef71dcf6cf25778636c8607191357886d80b8e7e5faf33727606e1",
+      "bytes": 9109532,
+      "fetched": "2026-09-27",
+      "licence": "FAA CIFP (Coded Instrument Flight Procedures, ARINC 424) — US Government work, public domain; see \"FAA CIFP Disclaimer.pdf\" inside the zip.",
+      "use": "KSFO approaches, SIDs, STARs, fixes, localizers, runway cross-check"
+    },
+    "ourairports/runways.csv": {
+      "id": "ourairports-runways",
+      "url": "https://davidmegginson.github.io/ourairports-data/runways.csv",
+      "sha256": "4202aab8eadafaab7f3350115cff5a7e5d8de482b98e1260c43a499a40d4dac4",
+      "bytes": 3966682,
+      "fetched": "2026-09-27",
+      "licence": "OurAirports — released into the public domain (https://ourairports.com/data/).",
+      "use": "T2 cross-check of runway ends"
+    },
+    "ourairports/airports.csv": {
+      "id": "ourairports-airports",
+      "url": "https://davidmegginson.github.io/ourairports-data/airports.csv",
+      "sha256": "2144a01fb74f20f80fcfc52a919e72e2f42ceb93aca456804a1cb9bb2d3ce79e",
+      "bytes": 12731283,
+      "fetched": "2026-09-27",
+      "licence": "OurAirports — public domain.",
+      "use": "KSFO reference point / elevation cross-check"
+    },
+    "metar/KSFO_2023.csv": {
+      "id": "metar-2023",
+      "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=SFO&data=metar&year1=2023&month1=1&day1=1&year2=2024&month2=1&day2=1&tz=Etc/UTC&format=onlycomma&latlon=no&report_type=3&missing=M&trace=T&direct=no",
+      "sha256": "99ef65681d5afb5bb7eed24467a48f1072a11ce7984e132286da39dfee3156c2",
+      "bytes": 920431,
+      "fetched": "2026-09-27",
+      "licence": "Iowa Environmental Mesonet ASOS archive (redistributed NWS/FAA METAR observations) — US Government observations, public domain; IEM asks for attribution and rate limiting.",
+      "use": "historical KSFO METARs for runway configuration statistics and shift weather (T6)"
+    },
+    "metar/KSFO_2024.csv": {
+      "id": "metar-2024",
+      "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=SFO&data=metar&year1=2024&month1=1&day1=1&year2=2025&month2=1&day2=1&tz=Etc/UTC&format=onlycomma&latlon=no&report_type=3&missing=M&trace=T&direct=no",
+      "sha256": "5e465cd92d5a2702f818b4c61401f879f9a012d3a2ee9df5f4b3cecceaf7f7f9",
+      "bytes": 918633,
+      "fetched": "2026-09-27",
+      "licence": "Iowa Environmental Mesonet ASOS archive (redistributed NWS/FAA METAR observations) — US Government observations, public domain; IEM asks for attribution and rate limiting.",
+      "use": "historical KSFO METARs for runway configuration statistics and shift weather (T6)"
+    },
+    "metar/KSFO_2025.csv": {
+      "id": "metar-2025",
+      "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=SFO&data=metar&year1=2025&month1=1&day1=1&year2=2026&month2=1&day2=1&tz=Etc/UTC&format=onlycomma&latlon=no&report_type=3&missing=M&trace=T&direct=no",
+      "sha256": "5ff3694faba2308e33a1059ad1c06cfeba2be6c3533ff4a626be18f29f1f272d",
+      "bytes": 920265,
+      "fetched": "2026-09-27",
+      "licence": "Iowa Environmental Mesonet ASOS archive (redistributed NWS/FAA METAR observations) — US Government observations, public domain; IEM asks for attribution and rate limiting.",
+      "use": "historical KSFO METARs for runway configuration statistics and shift weather (T6)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_1.zip": {
+      "id": "bts-2025-1",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_1.zip",
+      "sha256": "868387dcedaef1b8d8392e608e642219fde50d594c3cf2094aec858167629ccf",
+      "bytes": 27108664,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_2.zip": {
+      "id": "bts-2025-2",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_2.zip",
+      "sha256": "12dc8dbdb3c8b3c20d4c00a8b188196ae202f781a8760871ae502a9c733d0ecd",
+      "bytes": 25302583,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_3.zip": {
+      "id": "bts-2025-3",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_3.zip",
+      "sha256": "9c80fbc2112cdbf3f0613ec2001ba019b3ad75511cd69657080736e7eda9cef4",
+      "bytes": 30544825,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_4.zip": {
+      "id": "bts-2025-4",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_4.zip",
+      "sha256": "f3718431e988e2afd53a1714dfca37f67355b6fc06b02eb506bffa39300d608c",
+      "bytes": 29369186,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_5.zip": {
+      "id": "bts-2025-5",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_5.zip",
+      "sha256": "17c3419d7169b313b2bc8ddd3fd57e1e2d4d959c35f2da17f6a5610d4bac7d63",
+      "bytes": 30830593,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_6.zip": {
+      "id": "bts-2025-6",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_6.zip",
+      "sha256": "087b75e4e059516ca1181e58955d062f341933adb2706e5b2404ed10c9ecbdc6",
+      "bytes": 31131411,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_7.zip": {
+      "id": "bts-2025-7",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_7.zip",
+      "sha256": "74309a3a734d5104b4c212390c06eb3acacff15124b9cea49ba7d69a609a0d19",
+      "bytes": 32208704,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_8.zip": {
+      "id": "bts-2025-8",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_8.zip",
+      "sha256": "405668b8a807266236a635efbc1e9364abfb756db1a5c895e45abc9c7b7684f1",
+      "bytes": 30864245,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_9.zip": {
+      "id": "bts-2025-9",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_9.zip",
+      "sha256": "adc722b1c14944451b20ddcdbeec69bbc092310ab8044f758b8f4b82fde8d017",
+      "bytes": 28151630,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_10.zip": {
+      "id": "bts-2025-10",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_10.zip",
+      "sha256": "05d14d3fd67fa3e04b97c4d6bc7386f4a6c1cda13d2506cf0e9f0a6c620ed111",
+      "bytes": 30723803,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_11.zip": {
+      "id": "bts-2025-11",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_11.zip",
+      "sha256": "6d5b68eea3ebb25f3cb2843e701a6c809b5455301b3bbd7802a20d522ed770c8",
+      "bytes": 28847755,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "bts/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_12.zip": {
+      "id": "bts-2025-12",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_12.zip",
+      "sha256": "a2af96d186bc9997fef47382b8589198281c9a722286d88f30032af8ee7dcd0f",
+      "bytes": 30337431,
+      "fetched": "2026-09-27",
+      "licence": "US DOT Bureau of Transportation Statistics, Airline On-Time Performance Data — US Government work, public domain.",
+      "use": "real hourly SFO arrival/departure counts and carrier mix (traffic shape)"
+    },
+    "faa-7110/chap0_section_0.html": {
+      "id": "7110-chap0_section_0",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap0_section_0.html",
+      "sha256": "2d8bb151f9649a63e3ffeb53f4588412423917f1af3f0fb6a1ed9f0dc21bb2d4",
+      "bytes": 38400,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "faa-7110/chap2_section_1.html": {
+      "id": "7110-chap2_section_1",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap2_section_1.html",
+      "sha256": "9c2cc93c16733d71e9926fa8839fa3811af16402a26e5ad574c6c64c6c9531df",
+      "bytes": 126912,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "faa-7110/chap3_section_9.html": {
+      "id": "7110-chap3_section_9",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap3_section_9.html",
+      "sha256": "6cc5b40ecee91f9959b1d4f2a3c765ba510426b36a3b158f56a89e1eb4b4da3a",
+      "bytes": 103744,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "faa-7110/chap3_section_10.html": {
+      "id": "7110-chap3_section_10",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap3_section_10.html",
+      "sha256": "6284df8bd1b9140a8da527cbaab3b5381129c80dc1a41c65065e6cc859870ca9",
+      "bytes": 92141,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "faa-7110/chap5_section_5.html": {
+      "id": "7110-chap5_section_5",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap5_section_5.html",
+      "sha256": "b29e43cadff95b1e646250c53d50d277edea37b2c0f5526592b08af77708d56c",
+      "bytes": 112798,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "faa-7110/chap7_section_2.html": {
+      "id": "7110-chap7_section_2",
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap7_section_2.html",
+      "sha256": "9d8777363ae4a4ce379fa3a76bfb4090c2b3204e43273c4e9a5f35f9420bac44",
+      "bytes": 52895,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7110.65BB Air Traffic Control (HTML edition) — US Government work, public domain.",
+      "use": "separation, wake, same/intersecting runway rules (T4, T5); paragraphs quoted in docs/RULES.md"
+    },
+    "aircraft/FAA_Order_JO_7360.1K_Aircraft_Type_Designators.pdf": {
+      "id": "7360-1K",
+      "url": "https://www.faa.gov/documentLibrary/media/Order/FAA_Order_JO_7360.1K_Aircraft_Type_Designators.pdf",
+      "sha256": "64a709bf8863e177c3daffade253aa6362519186ba807943165f68490ee0c8fe",
+      "bytes": 11971409,
+      "fetched": "2026-09-27",
+      "licence": "FAA Order JO 7360.1K Aircraft Type Designators — US Government work, public domain.",
+      "use": "per-type CWT wake category, SRS category, weight class"
+    },
+    "capacity/SFO-Airport-Capacity-Profile-2019.pdf": {
+      "id": "sfo-capacity-profile",
+      "url": "https://www.faa.gov/sites/faa.gov/files/airports/planning_capacity/profiles/SFO-Airport-Capacity-Profile-2019.pdf",
+      "sha256": "84d5efed502a3c498180b375e8cf0ea58e4407ab6971416b16421f36a561dc2e",
+      "bytes": 1986206,
+      "fetched": "2026-09-27",
+      "licence": "FAA Airport Capacity Profile: San Francisco International (2019) — US Government work, public domain.",
+      "use": "called arrival/departure rates by runway configuration and weather (T6 throughput ranges)"
+    },
+    "aircraft/FAA-Aircraft-Char-Database.xlsx": {
+      "id": "faa-aircraft-char",
+      "url": "https://www.faa.gov/airports/engineering/aircraft_char_database/aircraft_data",
+      "sha256": "3e68848b6bb99f9700e25d33c080b993a80dc962d581a391f89aee94b6c8fcb3",
+      "bytes": 125570,
+      "fetched": "2026-09-27",
+      "licence": "FAA Aircraft Characteristics Database (Office of Airports) — US Government work, public domain.",
+      "use": "approach speed, approach category, wingspan/length per type (T3)"
+    }
+  }
+}

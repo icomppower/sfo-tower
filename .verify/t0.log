@@ -1,0 +1,33 @@
+  neg caught  flipped checksum of one raw file is caught
+  neg caught  missing checksum record is caught
+  neg caught  a truncated raw file is caught
+  neg caught  a source without a licence note is caught
+  ok   checksums verify (fetch-data --check)
+  ok   every manifest source has a checksum record — 28/28
+  ok   every record carries a licence note and a use
+  ok   source group cached: nasr
+  ok   source group cached: cifp
+  ok   source group cached: ourairports
+  ok   source group cached: metar
+  ok   source group cached: bts
+  ok   source group cached: 7110.65
+  ok   source group cached: aircraft
+  ok   12 BTS months cached
+  ok   3 METAR years cached
+  ok   NASR: 4 runways / 8 ends for KSFO
+  ok   NASR effective date matches the checksummed cycle
+  ok   CIFP: 8 runway ends, 3 localizers
+  ok   CIFP: ≥12 approaches, ≥8 SIDs, ≥8 STARs, 3 localizers — 15/11/13/3
+  ok   CIFP: ILS 28L, ILS 28R, ILS 19L present
+  ok   CIFP: every procedure fix resolved to coordinates
+  ok   METAR: ≥ 26,000 hourly obs over 2023–2025 — 26290
+  ok   METAR: LIFR/IFR hours present (fog exists)
+  ok   METAR: obs sorted, no gap > 6 h
+  ok   BTS: traffic derived for 12 months
+  ok   BTS: ≥ 250,000 SFO flights in 2025 and a 7-day pattern for every month — 289014
+  ok   aircraft: ≥ 40 types with approach speed, CWT and SRS — 44 types, missing 
+  ok   aircraft: every type cross-checked against JO 7360.1K
+  ok   capacity profile: 6 configuration rate ranges incl. VISUAL side-by and INSTRUMENT in-trail
+  ok   RULES.md quotes 3-9-6, 3-9-8, 3-10-3, 3-10-4, 5-5-4 from 7110.65BB
+NEGATIVE 4/4
+PASS T0 Data — 28 raw files checksummed, 26290 METARs, 15 approaches, 44 aircraft types (27 checks, 0 failed)
